@@ -1,0 +1,46 @@
+version: "3"
+services:
+
+  nginx:
+    depends_on:
+      - apiserver
+      - webclient
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - 3000:80
+
+  apiserver:
+    build:
+      context: ./apiserver
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - mongo
+    volumes:
+      - /app/node_modules
+      - ./apiserver:/app
+    environment:
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: example
+
+  webclient:
+    stdin_open: true
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./webclient
+    volumes:
+      - /app/node_modules
+      - ./webclient:/app
+    environment:
+      - WDS_SOCKET_PORT=0
+
+  mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example

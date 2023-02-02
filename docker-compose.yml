@@ -6,41 +6,22 @@ services:
       - apiserver
       - webclient
     restart: always
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./nginx
+    image: "pprieto009/betterreads-nginx"
     ports:
-      - 3000:80
+      - 80:80
 
   apiserver:
-    build:
-      context: ./apiserver
-      dockerfile: Dockerfile.dev
-    depends_on:
-      - mongo
-    volumes:
-      - /app/node_modules
-      - ./apiserver:/app
+    image: "pprieto009/betterreads-apiserver"
+    mem_limit: 128m
+    hostname: apiserver
     environment:
       MONGO_USERNAME: root
       MONGO_PASSWORD: example
+    restart: always
 
   webclient:
     stdin_open: true
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./webclient
-    volumes:
-      - /app/node_modules
-      - ./webclient:/app
-    environment:
-      - WDS_SOCKET_PORT=0
-
-  mongo:
-    image: mongo:latest
+    image: "pprieto009/betterreads-webclient"
+    mem_limit: 128m
+    hostname: webclient
     restart: always
-    ports:
-      - 27017:27017
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
