@@ -9,6 +9,8 @@ services:
     build:
       dockerfile: Dockerfile.dev
       context: ./nginx
+    ports:
+      - 3000:80
 
   apiserver:
     build:
@@ -19,8 +21,9 @@ services:
     volumes:
       - /app/node_modules
       - ./apiserver:/app
-    ports:
-      - 3001:3001
+    environment:
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: example
 
   webclient:
     stdin_open: true
@@ -30,8 +33,9 @@ services:
     volumes:
       - /app/node_modules
       - ./webclient:/app
-    ports:
-      - 3000:3000
+    environment:
+      - WDS_SOCKET_PORT=0
+
   mongo:
     image: mongo:latest
     restart: always
@@ -40,7 +44,3 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
-
-    
-    
-      

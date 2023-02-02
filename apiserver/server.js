@@ -42,9 +42,9 @@ app.use(expressSession({
 app.use(cookieParser());
 
 //ROUTES
-app.use('/api/books', require("./routes/books.js"))
-app.use('/api/auth', require("./routes/auth.js"))
-app.use('/api/user', require("./routes/user.js"))
+app.use('/books', require("./routes/books.js"))
+app.use('/auth', require("./routes/auth.js"))
+app.use('/user', require("./routes/user.js"))
 
 //ERROR FALLBACK
 app.use(errorHandler)

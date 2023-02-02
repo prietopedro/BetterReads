@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // we will define a bunch of API calls here.
-const apiUrl = "https://betterreads1.herokuapp.com" || 'http://localhost:5000';
+const apiUrl = "";
 //"https://betterreads1.herokuapp.com" || 
 // Google Books API URL for all book queries
 // Documentation URL: https://developers.google.com/books/docs/v1/using#WorkingVolumes
