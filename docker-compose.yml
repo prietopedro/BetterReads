@@ -1,13 +1,37 @@
 version: "3"
 services:
-  backend:
+
+  nginx:
+    depends_on:
+      - apiserver
+      - webclient
+    restart: always
     build:
-      context: ./betterreadsbe
       dockerfile: Dockerfile.dev
-    ports:
-      - 8000:8000
-    links:
+      context: ./nginx
+
+  apiserver:
+    build:
+      context: ./apiserver
+      dockerfile: Dockerfile.dev
+    depends_on:
       - mongo
+    volumes:
+      - /app/node_modules
+      - ./apiserver:/app
+    ports:
+      - 3001:3001
+
+  webclient:
+    stdin_open: true
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./webclient
+    volumes:
+      - /app/node_modules
+      - ./webclient:/app
+    ports:
+      - 3000:3000
   mongo:
     image: mongo:latest
     restart: always
