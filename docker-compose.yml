@@ -25,3 +25,5 @@ services:
     mem_limit: 128m
     hostname: webclient
     restart: always
+    environment:
+      - MONGO_DB_URL=$MONGO_DB_URL
