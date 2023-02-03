@@ -5,7 +5,7 @@ const connectDB = async () => {
         mongoose.set('strictQuery', false)
         // const conn = await mongoose.connect(process.env.MONGODB_URL);
         const connectionString = process.env.MONGO_DB_URL || 'mongodb://root:example@mongo:27017/backend?authSource=admin'
-        console.log(connectionString)
+        console.log("CONNECTION STRING: ", connectionString)
         const conn = await mongoose.connect(connectionString);
         console.log(`MONGODB CONNECTED: ${conn.connection.host}`)
     } catch (error) {
