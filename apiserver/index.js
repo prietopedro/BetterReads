@@ -1,5 +1,6 @@
 const express = require("express")
 const dotenv = require("dotenv")
+const cookieParser = require('cookie-parser');
 const rateLimit = require("express-rate-limit")
 const helmet = require("helmet")
 const mongoSanitize = require("express-mongo-sanitize")
@@ -31,6 +32,7 @@ app.use(rateLimit({
     windowMs: 60 * 60 * 1000,
     message: "Too many reequests from this IP, please try again in an hour!"
 }))
+app.use(cookieParser())
 app.use(helmet());
 app.use(mongoSanitize())
 app.use(xss())

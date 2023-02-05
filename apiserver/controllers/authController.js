@@ -12,12 +12,13 @@ exports.signup = catchAsync(async (req, res) => {
     const newUser = await User.create(req.body);
     const token = signToken(newUser._id)
     newUser.password = undefined;
+    res.cookie('jwt', token, {
+        expires: new Date(Date.now() + (parseInt(process.env.JWT_EXPIRES_IN.replace("d", "")) * 24 * 60 * 60 * 1000)),
+        secure: process.env.NODE_ENV === "production",
+        httpOnly: true
+    })
     return res.status(201).json({
         status: 'success',
-        token,
-        data: {
-            user: newUser
-        }
     })
 })
 
@@ -39,10 +40,10 @@ exports.login = catchAsync(async (req, res, next) => {
 
 exports.protect = catchAsync(async (req, res, next) => {
     req.requestTime = new Date().toISOString();
-    if (!req.headers.authorization || !req.headers.authorization.startsWith("Bearer ")) {
+    if (!req.cookies.jwt) {
         return next(new AppError(401, "You are not logged in! Please log in to get access"))
     }
-    let token = req.headers.authorization.split(" ")[1]
+    let token = req.cookies.jwt;
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
