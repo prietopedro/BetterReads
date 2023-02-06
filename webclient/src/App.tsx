@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import { store } from './state/store/store';
 import ProtectedRoutes from './components/ProtectedRoutes';
+import Search from './pages/Search';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Routes>
             <Route element={<PageWithNavigation />}>
               <Route path="/" element={<Homepage />} />
+              <Route path="/search" element={<Search />} />
               <Route element={<ProtectedRoutes />}>
                 <Route path="/home" element={<Dashboard />} />
               </Route>

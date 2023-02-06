@@ -38,6 +38,13 @@ exports.login = catchAsync(async (req, res, next) => {
     })
 })
 
+exports.logout = catchAsync(async (req, res, next) => {
+    res.clearCookie("jwt");
+    return res.status(200).json({
+        status: "success",
+    })
+})
+
 exports.protect = catchAsync(async (req, res, next) => {
     req.requestTime = new Date().toISOString();
     if (!req.cookies.jwt) {
@@ -48,6 +55,19 @@ exports.protect = catchAsync(async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
     if (!user) return next(new AppError(401, "The user no longer exist"))
+    req.user = user;
+    next()
+})
+
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+    req.requestTime = new Date().toISOString();
+    if (!req.cookies.jwt) {
+        return next()
+    }
+    let token = req.cookies.jwt;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    if (!user) return next()
     req.user = user;
     next()
 })

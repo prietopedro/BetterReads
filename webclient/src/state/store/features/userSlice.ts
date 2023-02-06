@@ -34,7 +34,7 @@ export const login = createAsyncThunk(
   'user/login',
   async (user: LoginData, thunkAPI): Promise<{ success: string } | unknown> => {
     try {
-      const response = await axios.post('/api/users/login', user, {
+      await axios.post('/api/users/login', user, {
         withCredentials: true,
       });
       localStorage.setItem('isLoggedIn', 'true');
@@ -60,7 +60,7 @@ export const register = createAsyncThunk(
     thunkAPI,
   ): Promise<{ success: string } | unknown> => {
     try {
-      const response = await axios.post('/api/users/signup', user, {
+      await axios.post('/api/users/signup', user, {
         withCredentials: true,
       });
       localStorage.setItem('isLoggedIn', 'true');
@@ -79,17 +79,58 @@ export const register = createAsyncThunk(
   },
 );
 
+export const logout = createAsyncThunk(
+  'user/logout',
+  async (_, thunkAPI): Promise<{ success: string } | unknown> => {
+    try {
+      const response = await axios.post(
+        '/api/users/logout',
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+      localStorage.clear();
+      return response.data;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const message =
+          error?.response?.data?.message || error?.message || error?.toString();
+        return thunkAPI.rejectWithValue(message as string);
+      }
+      return thunkAPI.rejectWithValue('Something very wrong');
+    }
+  },
+);
+
+export const getMe = createAsyncThunk(
+  'user/me',
+  async (
+    user: RegisterData,
+    thunkAPI,
+  ): Promise<{ success: string } | unknown> => {
+    try {
+      const userData = await axios.get('/api/users/me', {
+        withCredentials: true,
+      });
+
+      return userData.data.data.user;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const message =
+          error?.response?.data?.message || error?.message || error?.toString();
+        return thunkAPI.rejectWithValue(message as string);
+      }
+      return thunkAPI.rejectWithValue('Something very wrong');
+    }
+  },
+);
+
 export const UserSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    reset: (state) => {
-      localStorage.removeItem('isLoggedIn');
-      state.isLoading = false;
-      state.error = '';
-      state.user = {} as User;
-      state.isLoggedIn = false;
-    },
+    reset: () => initialState,
   },
   extraReducers: (builder) => {
     //
@@ -130,6 +171,33 @@ export const UserSlice = createSlice({
         state.isLoggedIn = false;
         state.error = action.payload as string;
         state.user = {} as User;
+      });
+    builder
+      .addCase(getMe.pending, (state) => {
+        state.isLoading = true;
+        state.error = '';
+      })
+      .addCase(getMe.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isLoggedIn = true;
+        state.error = '';
+        state.user = action.payload as User;
+      })
+      .addCase(getMe.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isLoggedIn = false;
+        state.error = action.payload as string;
+        state.user = {} as User;
+      });
+    builder
+      .addCase(logout.pending, (state) => {
+        state.isLoading = true;
+        state.error = '';
+      })
+      .addCase(logout.fulfilled, () => initialState)
+      .addCase(logout.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
       });
   },
 });

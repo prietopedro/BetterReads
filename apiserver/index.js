@@ -16,6 +16,7 @@ const { PORT } = require("./config/constants");
 const globalErrorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError")
 const userRouter = require("./routes/userRoutes")
+const bookRouter = require("./routes/bookRoutes")
 const mongoose = require("mongoose");
 const authController = require("./controllers/authController")
 
@@ -40,6 +41,7 @@ app.get("/", (req, res) => {
     res.send("WORKING")
 })
 app.use("/users", userRouter)
+app.use("/books", bookRouter)
 app.all("*", (req, res, next) => {
     next(new AppError(404, `Can't find ${req.originalUrl} on this server`))
 })

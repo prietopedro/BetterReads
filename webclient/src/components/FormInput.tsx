@@ -12,7 +12,12 @@ function FormInput({ label, ...props }: Props) {
   return (
     <FormControl width="100%" isInvalid={!!error} mt="1rem">
       {label && <FormLabel htmlFor={field.name}>{label}</FormLabel>}
-      <Input {...field} id={field.name} type={props.type} />
+      <Input
+        {...field}
+        id={field.name}
+        type={props.type}
+        placeholder={props.placeholder}
+      />
       {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
     </FormControl>
   );

@@ -11,7 +11,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
 import Wrapper from '../layout/Wrapper';
 import { useAppSelector, useAppDispatch } from '../state/store/store';
-import { reset } from '../state/store/features/userSlice';
+import { logout } from '../state/store/features/userSlice';
 
 function Navbar() {
   const router = useNavigate();
@@ -39,7 +39,7 @@ function Navbar() {
           <MenuList>
             <MenuItem
               onClick={async () => {
-                dispatch(reset());
+                dispatch(logout());
                 router('/');
               }}
             >
