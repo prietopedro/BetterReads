@@ -18,11 +18,13 @@ type Book = {
   favorited: boolean;
   status: string;
   userbookID: string;
+  rating: number;
 };
 type SearchBooksResponse = {
   status: string;
   totalItems: number;
   data: Book[];
+  page: number;
 };
 
 const initialState = {
@@ -68,6 +70,13 @@ export const BookSlice = createSlice({
         return book;
       });
     },
+    removeBook: (state, action: PayloadAction<Book>) => {
+      state.books = state.books.map((book) => {
+        if (book.userbookID === action.payload.id)
+          return { ...book, userbookID: '', status: '', favorited: false };
+        return book;
+      });
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -76,9 +85,13 @@ export const BookSlice = createSlice({
         state.error = '';
       })
       .addCase(searchBooks.fulfilled, (state, action) => {
-        state.books = state.books.concat(
-          (action.payload as SearchBooksResponse).data,
-        );
+        if ((action.payload as SearchBooksResponse).page === 0) {
+          state.books = (action.payload as SearchBooksResponse).data;
+        } else {
+          state.books = state.books.concat(
+            (action.payload as SearchBooksResponse).data,
+          );
+        }
         state.totalItems = (action.payload as SearchBooksResponse).totalItems;
         state.isLoading = false;
         state.error = '';
@@ -92,5 +105,5 @@ export const BookSlice = createSlice({
   },
 });
 
-export const { clear, changeBook } = BookSlice.actions;
+export const { clear, changeBook, removeBook } = BookSlice.actions;
 export default BookSlice.reducer;

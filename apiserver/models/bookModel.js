@@ -18,5 +18,8 @@ const bookSchema = new mongoose.Schema({
     }
 })
 bookSchema.index({ user: 1, googleID: 1 }, { unique: true })
+bookSchema.set('toJSON', {
+    virtuals: true
+});
 const Book = mongoose.model("Book", bookSchema);
 module.exports = Book;

@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, CSSReset } from '@chakra-ui/react';
 import { Provider } from 'react-redux';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import theme from './styles/theme';
 import PageWithNavigation from './layout/PageWithNavigation';
@@ -11,26 +13,34 @@ import Dashboard from './pages/Dashboard';
 import { store } from './state/store/store';
 import ProtectedRoutes from './components/ProtectedRoutes';
 import Search from './pages/Search';
+import ShelvesPage from './pages/ShelvesPage';
+import BookPage from './pages/BookPage';
 
+const queryClient = new QueryClient();
 function App() {
   return (
     <BrowserRouter>
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <CSSReset />
-          <Routes>
-            <Route element={<PageWithNavigation />}>
-              <Route path="/" element={<Homepage />} />
-              <Route path="/search" element={<Search />} />
-              <Route element={<ProtectedRoutes />}>
-                <Route path="/home" element={<Dashboard />} />
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>
+          <ThemeProvider theme={theme}>
+            <CSSReset />
+            <Routes>
+              <Route element={<PageWithNavigation />}>
+                <Route path="/" element={<Homepage />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/book/:id" element={<BookPage />} />
+                <Route element={<ProtectedRoutes />}>
+                  <Route path="/home" element={<Dashboard />} />
+                  <Route path="/shelves" element={<ShelvesPage />} />
+                </Route>
               </Route>
-            </Route>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-          </Routes>
-        </ThemeProvider>
-      </Provider>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+            </Routes>
+          </ThemeProvider>
+        </Provider>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
     </BrowserRouter>
   );
 }

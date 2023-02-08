@@ -11,7 +11,11 @@ import {
 } from '@chakra-ui/react';
 import { FaStar, FaHeart, FaChevronDown } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { editBook, addBook } from '../state/store/features/userBookSlice';
+import {
+  editBook,
+  addBook,
+  deleteBook,
+} from '../state/store/features/userBookSlice';
 import { useAppDispatch, useAppSelector } from '../state/store/store';
 
 type Props = {
@@ -25,11 +29,14 @@ type Props = {
   author: string;
   rating: number;
   userBookID: string;
+  userRating: number;
 };
 function BookCard({ onlyImage = false, ...props }: Props) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { isLoggedIn } = useAppSelector((state) => state.user);
+  const actualRating = props.userRating ? props.userRating : props.rating;
+  const actualRatingColor = props.userRating ? '#b59919' : '#EA7258';
   return (
     <Flex
       w={onlyImage ? '86px' : ['100%', '100%', '100%', '47%']}
@@ -41,7 +48,7 @@ function BookCard({ onlyImage = false, ...props }: Props) {
       <Box width="86px">
         <Box width="86px">
           <Box
-            onClick={() => navigate(`/book/${props.ISBN10}`)}
+            onClick={() => navigate(`/book/${props.id}`)}
             cursor="pointer"
             background={`url(${props.imageUrl}) no-repeat center /cover`}
             height="118px"
@@ -139,7 +146,13 @@ function BookCard({ onlyImage = false, ...props }: Props) {
               Finished
             </MenuItem>
             {props.userBookID && (
-              <MenuItem onClick={async () => {}}>Remove</MenuItem>
+              <MenuItem
+                onClick={async () => {
+                  dispatch(deleteBook(props.userBookID));
+                }}
+              >
+                Remove
+              </MenuItem>
             )}
           </MenuList>
         </Menu>
@@ -147,7 +160,7 @@ function BookCard({ onlyImage = false, ...props }: Props) {
       {!onlyImage && (
         <Box ml="1rem">
           <Heading
-            onClick={() => navigate(`/book/${props.ISBN10}`)}
+            onClick={() => navigate(`/book/${props.id}`)}
             cursor="pointer"
             fontSize="1rem"
             fontFamily="Frank Ruhl Libre"
@@ -170,11 +183,32 @@ function BookCard({ onlyImage = false, ...props }: Props) {
                     size="1.25rem"
                     cursor="pointer"
                     color={
-                      props.rating && Math.round(props.rating) >= i + 1
-                        ? '#EA7258'
+                      actualRating && Math.round(actualRating) >= i + 1
+                        ? actualRatingColor
                         : '#E8E8E8'
                     }
                     pr=".125rem"
+                    onClick={() => {
+                      if (!isLoggedIn) {
+                        navigate('/login');
+                      } else if (!props.userBookID) {
+                        dispatch(
+                          addBook({
+                            rating: i + 1,
+                            favorited: false,
+                            id: props.id,
+                          }),
+                        );
+                      } else {
+                        dispatch(
+                          editBook({
+                            rating: i + 1,
+                            favorited: props.favorited,
+                            id: props.userBookID,
+                          }),
+                        );
+                      }
+                    }}
                   />
                 );
               })}

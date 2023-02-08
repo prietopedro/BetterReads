@@ -7,12 +7,13 @@ import {
 import axios from 'axios';
 // eslint-disable-next-line import/no-cycle
 import { RootState } from '../store';
-import { changeBook } from './booksSlice';
+import { changeBook, removeBook } from './booksSlice';
 
 type EditUserBookParams = {
   favorited?: boolean;
   status?: string;
   id: string;
+  rating?: number;
 };
 type Book = {
   id: string;
@@ -24,6 +25,7 @@ type Book = {
   favorited: boolean;
   status: string;
   userbookID: string;
+  rating: number;
 };
 type UserBooksResponse = {
   status: string;
@@ -44,7 +46,7 @@ export const getBooks = createAsyncThunk(
   'userBooks/get',
   async (params, thunkAPI): Promise<UserBooksResponse | unknown> => {
     try {
-      const response = await axios.get('api/users/books', {
+      const response = await axios.get('/api/users/books', {
         withCredentials: true,
       });
       return response.data;
@@ -67,10 +69,11 @@ export const addBook = createAsyncThunk(
 
       if (params.status) changes.status = params.status;
       else changes.status = 'planned';
+      if (params.rating) changes.rating = params.rating;
 
       changes.googleID = params.id;
 
-      const response = await axios.post(`api/users/books`, changes, {
+      const response = await axios.post(`/api/users/books`, changes, {
         withCredentials: true,
       });
 
@@ -92,8 +95,9 @@ export const editBook = createAsyncThunk(
       const changes: EditUserBookParams = {} as EditUserBookParams;
       if (params.favorited !== null) changes.favorited = params.favorited;
       if (params.status) changes.status = params.status;
+      if (params.rating) changes.rating = params.rating;
       const response = await axios.put(
-        `api/users/books/${params.id}`,
+        `/api/users/books/${params.id}`,
         changes,
         {
           withCredentials: true,
@@ -107,11 +111,26 @@ export const editBook = createAsyncThunk(
   },
 );
 
+export const deleteBook = createAsyncThunk(
+  'userBook/delete',
+  async (params: string, thunkAPI): Promise<EditUserBookResponse | unknown> => {
+    try {
+      const response = await axios.delete(`/api/users/books/${params}`, {
+        withCredentials: true,
+      });
+      thunkAPI.dispatch(removeBook(response.data.data.book));
+      return response.data;
+    } catch (error: unknown) {
+      return thunkAPI.rejectWithValue('To Do');
+    }
+  },
+);
+
 export const UserBookSlice = createSlice({
-  name: 'books',
+  name: 'userBooks',
   initialState,
   reducers: {
-    clear: (state) => initialState,
+    clear: () => initialState,
   },
   extraReducers: (builder) => {
     builder
@@ -164,6 +183,23 @@ export const UserBookSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
       });
+    builder
+      .addCase(deleteBook.pending, (state) => {
+        state.isLoading = true;
+        state.error = '';
+      })
+      .addCase(deleteBook.fulfilled, (state, action) => {
+        const payload = action.payload as EditUserBookResponse;
+        state.books = state.books.filter((book) => {
+          return book.userbookID !== payload.data.book.id;
+        });
+        state.isLoading = false;
+        state.error = '';
+      })
+      .addCase(deleteBook.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      });
   },
 });
 
@@ -179,4 +215,7 @@ export const planned = createSelector([items], (books) =>
 );
 export const reading = createSelector([items], (books) =>
   books.filter((book) => book.status === 'reading'),
+);
+export const finished = createSelector([items], (books) =>
+  books.filter((book) => book.status === 'finished'),
 );

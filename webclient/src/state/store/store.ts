@@ -5,12 +5,14 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { UserSlice } from './features/userSlice';
 import { BookSlice } from './features/booksSlice';
 import { UserBookSlice } from './features/userBookSlice';
+import { UserShelfSlice } from './features/userShelfSlice';
 
 export const store = configureStore({
   reducer: {
     user: UserSlice.reducer,
     books: BookSlice.reducer,
     userBooks: UserBookSlice.reducer,
+    userShelves: UserShelfSlice.reducer,
   },
 });
 

@@ -1,26 +1,25 @@
 import { Box, Button, Text, Flex } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   favorites,
+  getBooks,
   planned,
   reading,
 } from '../state/store/features/userBookSlice';
 import { useAppDispatch, useAppSelector } from '../state/store/store';
-// import { CreateShelfModal } from '.';
+import CreateShelfModal from './CreateBookshelfModal';
+import { fetchUserBooks } from '../api/userbooks';
+import { fetchUserShelves } from '../api/usershelves';
 
 function Shelves() {
-  const router = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
-  const user = useAppSelector((state) => state.user.user);
-  const favoriteBooks = useAppSelector(favorites);
-  const plannedBooks = useAppSelector(planned);
-  const readingBooks = useAppSelector(reading);
-
+  const navigate = useNavigate();
+  const [createShelfIsOpen, createShelfSetIsOpen] = useState(false);
   const defaultValue = (
     <Box
       mx="0.5rem"
-      onClick={() => router(`/shelves`)}
+      onClick={() => navigate(`/shelves`)}
       cursor="pointer"
       background={`url("/lockedBook.svg") no-repeat center /cover`}
       width="50px"
@@ -28,9 +27,30 @@ function Shelves() {
     />
   );
 
+  const { data, isLoading, error, isSuccess } = useQuery({
+    queryKey: ['userbooks'],
+    queryFn: () => fetchUserBooks(),
+  });
+  const favoriteBooks = useMemo(
+    () => (data ? data?.filter((book) => book.favorited) : []),
+    [data],
+  );
+  const plannedBooks = useMemo(
+    () => (data ? data?.filter((book) => book.status === 'planned') : []),
+    [data],
+  );
+  const readingBooks = useMemo(
+    () => (data ? data?.filter((book) => book.status === 'reading') : []),
+    [data],
+  );
+
+  if (isLoading) return <div>Loading...</div>;
   return (
     <>
-      {/* <CreateShelfModal setIsOpen={setIsOpen} isOpen={isOpen} /> */}
+      <CreateShelfModal
+        setIsOpen={createShelfSetIsOpen}
+        isOpen={createShelfIsOpen}
+      />
       <Flex
         direction="column"
         w={['100%', '100%', '100%', '20%']}
@@ -43,7 +63,7 @@ function Shelves() {
           fontWeight="bold"
           fontFamily="Frank Ruhl Libre"
           cursor="pointer"
-          onClick={() => router('/shelves')}
+          onClick={() => navigate('/shelves')}
         >
           My Shelves {'>'}
         </Text>
@@ -60,7 +80,7 @@ function Shelves() {
           lineHeight="1.375rem"
           cursor="pointer"
           _hover={{ background: 'none', color: 'teal.400' }}
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => createShelfSetIsOpen(!createShelfIsOpen)}
         >
           Create new shelf
         </Button>
@@ -84,7 +104,7 @@ function Shelves() {
                         <Box
                           key={(x.toString() + i).toString()}
                           mx="0.5rem"
-                          onClick={() => router(`/book/${x.ISBN10}`)}
+                          onClick={() => navigate(`/book/${x.id}`)}
                           cursor="pointer"
                           background={`url(${x.thumbnail}) no-repeat center /cover`}
                           width="50px"
@@ -115,7 +135,7 @@ function Shelves() {
                         <Box
                           key={(x.toString() + i).toString()}
                           mx="0.5rem"
-                          onClick={() => router(`/book/${x.ISBN10}`)}
+                          onClick={() => navigate(`/book/${x.id}`)}
                           cursor="pointer"
                           background={`url(${x.thumbnail}) no-repeat center /cover`}
                           width="50px"
@@ -146,7 +166,7 @@ function Shelves() {
                         <Box
                           key={(x.toString() + i).toString()}
                           mx="0.5rem"
-                          onClick={() => router(`/book/${x.ISBN10}`)}
+                          onClick={() => navigate(`/book/${x.id}`)}
                           cursor="pointer"
                           background={`url(${x.thumbnail}) no-repeat center /cover`}
                           width="50px"

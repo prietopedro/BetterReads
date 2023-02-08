@@ -9,6 +9,10 @@ import {
   MenuItem,
 } from '@chakra-ui/react';
 import BookCard from './Bookcard';
+import ManageBookshelfModal from './ManageBookshelfModal';
+import { useAppDispatch } from '../state/store/store';
+import { deleteShelf } from '../state/store/features/userShelfSlice';
+import EditBookshelfModal from './EditBookshelfModal';
 
 // import { EditShelfModal } from "./EditShelfModal";
 // import { ManageBookshelfModal } from "./ManageBookshelfModal";
@@ -23,33 +27,34 @@ type Book = {
   favorited: boolean;
   status: string;
   userbookID: string;
+  rating: number;
 };
 
 type Props = {
+  id?: string;
   library: string;
   books: Book[];
   onlyImage?: boolean;
 };
 
-function HomeLibrary({ library, books, onlyImage = false }: Props) {
-  const [isOpen, setIsOpen] = useState(false);
+function HomeLibrary({ library, books, onlyImage = false, id = '' }: Props) {
   const [editOpen, setEditOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const dispatch = useAppDispatch();
   return (
     <Box mt={2} borderBottom="1px solid rgb(217,217,217)">
-      {/* <DeleteShelfModal isOpen={isOpen} setIsOpen={setIsOpen} id={id} /> */}
-      {/* <EditShelfModal
+      <EditBookshelfModal
         isOpen={editOpen}
         setIsOpen={setEditOpen}
         id={id}
         name={library}
-      /> */}
-      {/* <ManageBookshelfModal
+      />
+      <ManageBookshelfModal
         isOpen={addOpen}
         setIsOpen={setAddOpen}
         id={id}
-        name={library}
-      /> */}
+        books={books}
+      />
       <Flex justifyContent="space-between">
         <Flex w="90%" alignItems="center">
           <Text
@@ -63,7 +68,7 @@ function HomeLibrary({ library, books, onlyImage = false }: Props) {
           >
             {library} ({books?.length || 0})
           </Text>
-          {false && (
+          {id && (
             <Menu>
               <MenuButton>
                 <Text
@@ -80,8 +85,10 @@ function HomeLibrary({ library, books, onlyImage = false }: Props) {
                 <MenuItem onClick={() => setAddOpen(true)}>
                   Manage Books
                 </MenuItem>
-                {/* <MenuItem onClick={() => setEditOpen(true)}>Update</MenuItem> */}
-                <MenuItem onClick={() => setIsOpen(true)}>Delete</MenuItem>
+                <MenuItem onClick={() => setEditOpen(true)}>Update</MenuItem>
+                <MenuItem onClick={() => dispatch(deleteShelf(id))}>
+                  Delete
+                </MenuItem>
               </MenuList>
             </Menu>
           )}
@@ -98,7 +105,7 @@ function HomeLibrary({ library, books, onlyImage = false }: Props) {
                 id={book.id}
                 key={book.id + i.toString()}
                 imageUrl={book.thumbnail || ''}
-                onlyImage={false}
+                onlyImage={onlyImage}
                 title={book.title}
                 author={book.authors?.length ? book.authors[0] : 'Unknown'}
                 rating={book.average_rating || 0}
@@ -106,6 +113,7 @@ function HomeLibrary({ library, books, onlyImage = false }: Props) {
                 status={book.status}
                 favorited={book.favorited}
                 userBookID={book.userbookID}
+                userRating={book.rating}
               />
             );
           })}

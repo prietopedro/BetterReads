@@ -19,6 +19,7 @@ type Book = {
   favorited: boolean;
   status: string;
   userbookID: string;
+  rating: number;
 };
 function Search() {
   const [searchParams] = useSearchParams();
@@ -57,6 +58,7 @@ function Search() {
                   status={book.status}
                   favorited={book.favorited}
                   userBookID={book.userbookID}
+                  userRating={book.rating}
                 />
               ))
             : 'Loading...'}

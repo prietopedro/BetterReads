@@ -34,6 +34,7 @@ exports.getBooks = catchAsync(async (req, res) => {
       favorited: userBooks.find(userbook => userbook.googleID === book.id)?.favorited || false,
       status: userBooks.find(userbook => userbook.googleID === book.id)?.status || null,
       userbookID: userBooks.find(userbook => userbook.googleID === book.id)?._id || null,
+      rating: userBooks.find(userbook => userbook.googleID === book.id)?.rating || null
     }
   })
   // Searh User books 
@@ -42,6 +43,48 @@ exports.getBooks = catchAsync(async (req, res) => {
   return res.status(201).json({
       status: 'success',
       totalItems,
-      data: myBooks
+      data: myBooks,
+      page: page
+  })
+})
+
+exports.getBook = catchAsync(async (req, res) => {
+  // Query the books from google books api
+  const id = req.params.id
+  const response = await fetch(`https://www.googleapis.com/books/v1/volumes/${id}`)
+  const book = await response.json()
+
+  let userBook = {};
+  if(req.user){
+    userBook = await await Book.findOne({
+      'googleID': book.id,
+      'user': req.user
+    })
+  }
+  console.log(book);
+
+  const responseBook = {
+      id: book.id,
+      thumbnail: book.volumeInfo?.imageLinks?.thumbnail,
+      title: book.volumeInfo?.title,
+      authors: book.volumeInfo?.authors || ["Unknown"],
+      average_rating: book.volumeInfo?.averageRating,
+      ISBN10: book.volumeInfo?.industryIdentifiers?.find(x => x.type === "ISBN_10")?.identifier,
+      favorited: userBook?.favorited || false,
+      status: userBook?.status || null,
+      userbookID: userBook._id || null,
+      rating: userBook?.rating || null,
+      subtitle: book.volumeInfo?.subtitle,
+      description: book.volumeInfo?.description,
+      publisher: book.volumeInfo?.publisher,
+      ISBN13: book.volumeInfo?.industryIdentifiers?.find(x => x.type === "ISBN_13")?.identifier,
+      length: book.volumeInfo?.pageCount,
+      categories: book.volumeInfo?.categories
+    }
+  console.log(responseBook);
+ 
+  return res.status(201).json({
+      status: 'success',
+      data: {book: responseBook}
   })
 })

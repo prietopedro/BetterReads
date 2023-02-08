@@ -15,5 +15,8 @@ const shelfSchema = new mongoose.Schema({
     }]
 })
 shelfSchema.index({ user: 1, name: 1 }, { unique: true })
+shelfSchema.set('toJSON', {
+    virtuals: true
+});
 const Shelf = mongoose.model("Shelf", shelfSchema)
 module.exports = Shelf;
