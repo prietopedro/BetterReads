@@ -15,48 +15,29 @@ exports.me = (req, res) => {
 
 exports.getUserBooks = catchAsync( async (req, res) => {
     const books = await Book.find({user: req.user})
-    const newBooks = []
-    for(let book of books){
-        console.log(book.googleID)
-        const response = await fetch('https://www.googleapis.com/books/v1/volumes/' + book.googleID);
-        const googleBook = await response.json();
-        newBooks.push({
-            id: googleBook.id,
-            thumbnail: googleBook.volumeInfo?.imageLinks?.thumbnail,
-            title: googleBook.volumeInfo?.title,
-            authors: googleBook.volumeInfo?.authors || ["Unknown"],
-            average_rating: googleBook.volumeInfo?.averageRating,
-            ISBN10: googleBook.volumeInfo?.industryIdentifiers?.find(x => x.type === "ISBN_10")?.identifier,
-            favorited: book.favorited,
-            status: book.status,
-            userbookID: book._id,
-            rating: book.rating
-        })
-    }
     return res.status(200).json({
         status: "success",
         data: {
-            books: newBooks
+            books: books
         }
     })
 })
 
 exports.addUserBook = catchAsync( async (req, res) => {
-    let book = await Book.create({user: req.user, favorited: req.body.favorited, status: req.body.status, googleID: req.body.googleID, rating: req.body.rating || null})
     const response = await fetch('https://www.googleapis.com/books/v1/volumes/'+req.body.googleID);
     const googleBook = await response.json();
-    book = { 
-            id: googleBook.id,
-            thumbnail: googleBook.volumeInfo?.imageLinks?.thumbnail,
-            title: googleBook.volumeInfo?.title,
-            authors: googleBook.volumeInfo?.authors || ["Unknown"],
-            average_rating: googleBook.volumeInfo?.averageRating,
-            ISBN10: googleBook.volumeInfo?.industryIdentifiers?.find(x => x.type === "ISBN_10")?.identifier,
-            favorited: book.favorited,
-            status: book.status,
-            userbookID: book._id,
-            rating: book.rating
-            }
+    let book = await Book.create({
+        user: req.user, 
+        rating: req.body.rating,
+        favorited: req.body.favorited, 
+        status: req.body.status, 
+        googleID: req.body.googleID, 
+        title: googleBook.volumeInfo?.title,
+        authors: googleBook.volumeInfo?.authors?.length ? googleBook.volumeInfo?.authors[0] : "Unknown",
+        average_rating: googleBook.volumeInfo?.averageRating,
+        thumbnail: googleBook.volumeInfo?.imageLinks?.thumbnail
+    })
+    console.log(book)
     return res.status(200).json({
         status: "success",
         data: {
@@ -69,25 +50,10 @@ exports.editUserBook = catchAsync(async (req, res, next) => {
     let book = await Book.findById(req.params.id);
     if(!book) return next(new AppError(404, "No Userbook with this id found"));
     if(!book.user.equals(req.user._id)) return next(new AppError(403, "You can not edit someone elses book"));
-    if(req.body.favorited !== null) book.favorited = req.body.favorited;
+    if(req.body.favorited !== undefined) book.favorited = req.body.favorited;
     if(req.body.status) book.status = req.body.status;
     if(req.body.rating) book.rating = req.body.rating;
     await book.save();
-   
-    const response = await fetch('https://www.googleapis.com/books/v1/volumes/'+ book.googleID);
-    const googleBook = await response.json();
-    book = { 
-            id: googleBook.id,
-            thumbnail: googleBook.volumeInfo?.imageLinks?.thumbnail,
-            title: googleBook.volumeInfo?.title,
-            authors: googleBook.volumeInfo?.authors || ["Unknown"],
-            average_rating: googleBook.volumeInfo?.averageRating,
-            ISBN10: googleBook.volumeInfo?.industryIdentifiers?.find(x => x.type === "ISBN_10")?.identifier,
-            favorited: book.favorited,
-            status: book.status,
-            userbookID: book._id,
-            rating: book.rating
-            }
     return res.status(200).json({
         status: "success",
         data: {

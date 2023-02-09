@@ -8,15 +8,25 @@ import {
   MenuList,
   MenuItem,
   Icon,
+  Button,
 } from '@chakra-ui/react';
+import { useMutation } from '@tanstack/react-query';
 import { FaStar, FaHeart, FaChevronDown } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
+import { BooksAxiosResponse } from '../api/books';
+import queryClient from '../api/queryClient';
 import {
-  editBook,
-  addBook,
-  deleteBook,
-} from '../state/store/features/userBookSlice';
-import { useAppDispatch, useAppSelector } from '../state/store/store';
+  AddUserBook,
+  addUserBook,
+  deleteUserBook,
+  EditUserBook,
+  editUserBook,
+} from '../api/userbooks';
+import // editBook,
+// addBook,
+// deleteBook,
+'../state/store/features/userBookSlice';
+import { useAppSelector } from '../state/store/store';
 
 type Props = {
   id: string;
@@ -28,15 +38,159 @@ type Props = {
   title: string;
   author: string;
   rating: number;
-  userBookID: string;
+  googleID: string;
   userRating: number;
 };
+
+export interface InfiniteBooks {
+  pages: BooksAxiosResponse[];
+  pageParams: string;
+}
+
 function BookCard({ onlyImage = false, ...props }: Props) {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  const [searchParams] = useSearchParams();
   const { isLoggedIn } = useAppSelector((state) => state.user);
   const actualRating = props.userRating ? props.userRating : props.rating;
   const actualRatingColor = props.userRating ? '#b59919' : '#EA7258';
+  const name = searchParams.get('name');
+  const { id: bookID } = useParams();
+
+  const { mutate: deleteBook } = useMutation({
+    mutationFn: (id: string) => deleteUserBook(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userbooks'] });
+    },
+    onMutate: (variables) => {
+      const bookPageData = queryClient.getQueryData(['book', bookID]);
+      if (bookPageData) {
+        queryClient.setQueryData(['book', bookID], {
+          ...bookPageData,
+          status: '',
+          favorited: false,
+          id: '',
+          rating: '',
+        });
+      }
+
+      const bookSearchData = queryClient.getQueryData<InfiniteBooks>([
+        'books',
+        name,
+      ]);
+      if (bookSearchData) {
+        const newData = {
+          ...bookSearchData,
+          pages: bookSearchData.pages.map((page) => ({
+            ...page,
+            data: page.data.map((book) => {
+              if (book.id === variables)
+                return {
+                  ...book,
+                  status: '',
+                  favorited: false,
+                  id: '',
+                  rating: '',
+                };
+              return book;
+            }),
+          })),
+        };
+        queryClient.setQueryData(['books', name], newData);
+      }
+    },
+  });
+  const { mutate: editBook, isLoading: editLoading } = useMutation({
+    mutationFn: (params: EditUserBook) => editUserBook(params),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userbooks'] });
+    },
+    onMutate: (variables) => {
+      const bookPageData = queryClient.getQueryData(['book', bookID]);
+      if (bookPageData) {
+        queryClient.setQueryData(['book', bookID], {
+          ...bookPageData,
+          ...variables,
+        });
+      }
+
+      const bookSearchData = queryClient.getQueryData<InfiniteBooks>([
+        'books',
+        name,
+      ]);
+      if (bookSearchData) {
+        const newData = {
+          ...bookSearchData,
+          pages: bookSearchData.pages.map((page) => ({
+            ...page,
+            data: page.data.map((book) => {
+              if (book.id === variables.userbookID)
+                return { ...book, ...variables };
+              return book;
+            }),
+          })),
+        };
+        queryClient.setQueryData(['books', name], newData);
+      }
+    },
+  });
+
+  const { mutate: addBook } = useMutation({
+    mutationFn: (params: AddUserBook) => addUserBook(params),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['userbooks'] });
+      const bookSearchData = queryClient.getQueryData<InfiniteBooks>([
+        'books',
+        name,
+      ]);
+      if (bookSearchData) {
+        const newData = {
+          ...bookSearchData,
+          pages: bookSearchData.pages.map((page) => ({
+            ...page,
+            data: page.data.map((book) => {
+              if (book.googleID === data.googleID) return data;
+              return book;
+            }),
+          })),
+        };
+        queryClient.setQueryData(['books', name], newData);
+      }
+    },
+    onMutate: (variables) => {
+      const bookPageData = queryClient.getQueryData(['book', bookID]);
+      if (bookPageData) {
+        queryClient.setQueryData(['book', bookID], {
+          ...bookPageData,
+          ...variables,
+        });
+      }
+
+      const bookSearchData = queryClient.getQueryData<InfiniteBooks>([
+        'books',
+        name,
+      ]);
+      if (bookSearchData) {
+        const newData = {
+          ...bookSearchData,
+          pages: bookSearchData.pages.map((page) => ({
+            ...page,
+            data: page.data.map((book) => {
+              if (book.googleID === variables.googleID)
+                return {
+                  ...book,
+                  ...variables,
+                  status: variables.status || 'planned',
+                  favorited: variables.favorited || false,
+                };
+              return book;
+            }),
+          })),
+        };
+        queryClient.setQueryData(['books', name], newData);
+      }
+    },
+  });
+
   return (
     <Flex
       w={onlyImage ? '86px' : ['100%', '100%', '100%', '47%']}
@@ -48,7 +202,7 @@ function BookCard({ onlyImage = false, ...props }: Props) {
       <Box width="86px">
         <Box width="86px">
           <Box
-            onClick={() => navigate(`/book/${props.id}`)}
+            onClick={() => navigate(`/book/${props.googleID}`)}
             cursor="pointer"
             background={`url(${props.imageUrl}) no-repeat center /cover`}
             height="118px"
@@ -77,21 +231,16 @@ function BookCard({ onlyImage = false, ...props }: Props) {
               onClick={() => {
                 if (!isLoggedIn) {
                   navigate('/login');
-                } else if (!props.userBookID) {
-                  dispatch(
-                    addBook({
-                      status: 'planned',
-                      id: props.id,
-                    }),
-                  );
+                } else if (!props.id) {
+                  addBook({
+                    googleID: props.googleID,
+                    status: 'planned',
+                  });
                 } else {
-                  dispatch(
-                    editBook({
-                      status: 'planned',
-                      id: props.userBookID,
-                      favorited: props.favorited,
-                    }),
-                  );
+                  editBook({
+                    userbookID: props.id,
+                    status: 'planned',
+                  });
                 }
               }}
             >
@@ -101,21 +250,16 @@ function BookCard({ onlyImage = false, ...props }: Props) {
               onClick={() => {
                 if (!isLoggedIn) {
                   navigate('/login');
-                } else if (!props.userBookID) {
-                  dispatch(
-                    addBook({
-                      status: 'reading',
-                      id: props.id,
-                    }),
-                  );
+                } else if (!props.id) {
+                  addBook({
+                    googleID: props.googleID,
+                    status: 'reading',
+                  });
                 } else {
-                  dispatch(
-                    editBook({
-                      status: 'reading',
-                      favorited: props.favorited,
-                      id: props.userBookID,
-                    }),
-                  );
+                  editBook({
+                    userbookID: props.id,
+                    status: 'reading',
+                  });
                 }
               }}
             >
@@ -125,30 +269,25 @@ function BookCard({ onlyImage = false, ...props }: Props) {
               onClick={() => {
                 if (!isLoggedIn) {
                   navigate('/login');
-                } else if (!props.userBookID) {
-                  dispatch(
-                    addBook({
-                      status: 'finished',
-                      id: props.id,
-                    }),
-                  );
+                } else if (!props.id) {
+                  addBook({
+                    googleID: props.googleID,
+                    status: 'finished',
+                  });
                 } else {
-                  dispatch(
-                    editBook({
-                      status: 'finished',
-                      id: props.userBookID,
-                      favorited: props.favorited,
-                    }),
-                  );
+                  editBook({
+                    userbookID: props.id,
+                    status: 'finished',
+                  });
                 }
               }}
             >
               Finished
             </MenuItem>
-            {props.userBookID && (
+            {props.id && (
               <MenuItem
                 onClick={async () => {
-                  dispatch(deleteBook(props.userBookID));
+                  deleteBook(props.id);
                 }}
               >
                 Remove
@@ -160,12 +299,12 @@ function BookCard({ onlyImage = false, ...props }: Props) {
       {!onlyImage && (
         <Box ml="1rem">
           <Heading
-            onClick={() => navigate(`/book/${props.id}`)}
+            onClick={() => navigate(`/book/${props.googleID}`)}
             cursor="pointer"
             fontSize="1rem"
             fontFamily="Frank Ruhl Libre"
           >
-            {props.title.length > 70
+            {props.title?.length > 70
               ? `${props.title.substring(0, 70)} ...`
               : props.title}
           </Heading>
@@ -191,22 +330,16 @@ function BookCard({ onlyImage = false, ...props }: Props) {
                     onClick={() => {
                       if (!isLoggedIn) {
                         navigate('/login');
-                      } else if (!props.userBookID) {
-                        dispatch(
-                          addBook({
-                            rating: i + 1,
-                            favorited: false,
-                            id: props.id,
-                          }),
-                        );
+                      } else if (!props.id) {
+                        addBook({
+                          googleID: props.googleID,
+                          rating: i + 1,
+                        });
                       } else {
-                        dispatch(
-                          editBook({
-                            rating: i + 1,
-                            favorited: props.favorited,
-                            id: props.userBookID,
-                          }),
-                        );
+                        editBook({
+                          userbookID: props.id,
+                          rating: i + 1,
+                        });
                       }
                     }}
                   />
@@ -217,28 +350,25 @@ function BookCard({ onlyImage = false, ...props }: Props) {
       )}
       {!onlyImage && (
         <Flex width="10%" ml="auto" justifyContent="flex-end">
-          <Box
+          <Button
             as={FaHeart}
             size="1.5rem"
             fill={!props.favorited ? 'grey' : '#EA7258'}
             cursor="pointer"
+            isLoading={editLoading}
             onClick={() => {
               if (!isLoggedIn) {
                 navigate('/login');
-              } else if (!props.userBookID) {
-                dispatch(
-                  addBook({
-                    favorited: true,
-                    id: props.id,
-                  }),
-                );
+              } else if (!props.id) {
+                addBook({
+                  googleID: props.googleID,
+                  favorited: true,
+                });
               } else {
-                dispatch(
-                  editBook({
-                    favorited: !props.favorited,
-                    id: props.userBookID,
-                  }),
-                );
+                editBook({
+                  userbookID: props.id,
+                  favorited: !props.favorited,
+                });
               }
             }}
           />

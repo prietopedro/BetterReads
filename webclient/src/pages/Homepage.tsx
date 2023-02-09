@@ -32,7 +32,7 @@ function Homepage() {
             cursor="pointer"
             border="2px solid #6d9a7f"
             _hover={{ bg: '#6d9a7f', color: 'white' }}
-            onClick={() => router('/login')}
+            onClick={() => router('/search')}
           >
             Search Books
           </Button>

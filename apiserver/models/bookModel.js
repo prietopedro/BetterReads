@@ -15,7 +15,11 @@ const bookSchema = new mongoose.Schema({
     googleID: {
         type: String,
         required: [true, "Book needs a google ID"]
-    }
+    },
+    title: String,
+    thumbnail: String,
+    authors: String,
+    average_rating: Number,
 })
 bookSchema.index({ user: 1, googleID: 1 }, { unique: true })
 bookSchema.set('toJSON', {

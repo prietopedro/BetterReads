@@ -11,7 +11,7 @@ type UserShelvesAxiosResponse = {
 
 export const fetchUserShelves = async () => {
   const res = await axiosWithCredentials.get<UserShelvesAxiosResponse>(
-    'api/user/shelves',
+    'api/users/shelves',
   );
   return res.data.data.shelves;
 };

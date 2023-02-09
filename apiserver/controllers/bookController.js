@@ -25,7 +25,7 @@ exports.getBooks = catchAsync(async (req, res) => {
 
   const myBooks = books.items.map((book) => {
     return {
-      id: book.id,
+      id: userBooks.find(userbook => userbook.googleID === book.id)?.id,
       thumbnail: book.volumeInfo?.imageLinks?.thumbnail,
       title: book.volumeInfo?.title,
       authors: book.volumeInfo?.authors || ["Unknown"],
@@ -33,7 +33,7 @@ exports.getBooks = catchAsync(async (req, res) => {
       ISBN10: book.volumeInfo?.industryIdentifiers?.find(x => x.type === "ISBN_10")?.identifier,
       favorited: userBooks.find(userbook => userbook.googleID === book.id)?.favorited || false,
       status: userBooks.find(userbook => userbook.googleID === book.id)?.status || null,
-      userbookID: userBooks.find(userbook => userbook.googleID === book.id)?._id || null,
+      googleID: book.id,
       rating: userBooks.find(userbook => userbook.googleID === book.id)?.rating || null
     }
   })
@@ -64,7 +64,7 @@ exports.getBook = catchAsync(async (req, res) => {
   console.log(book);
 
   const responseBook = {
-      id: book.id,
+      id: userBook?.id,
       thumbnail: book.volumeInfo?.imageLinks?.thumbnail,
       title: book.volumeInfo?.title,
       authors: book.volumeInfo?.authors || ["Unknown"],
@@ -72,7 +72,7 @@ exports.getBook = catchAsync(async (req, res) => {
       ISBN10: book.volumeInfo?.industryIdentifiers?.find(x => x.type === "ISBN_10")?.identifier,
       favorited: userBook?.favorited || false,
       status: userBook?.status || null,
-      userbookID: userBook._id || null,
+      googleID: book.id,
       rating: userBook?.rating || null,
       subtitle: book.volumeInfo?.subtitle,
       description: book.volumeInfo?.description,

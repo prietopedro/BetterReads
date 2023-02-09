@@ -1,62 +1,20 @@
-import { useEffect, useState, useContext } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Box, Text, Heading, Flex, Tag } from '@chakra-ui/react';
-import axios from 'axios';
-import { useQuery } from '@tanstack/react-query';
 
 import SearchBooks from '../components/SearchBooks';
 import BookCard from '../components/Bookcard';
 import PageLayout from '../layout/PageLayout';
-import { useAppDispatch } from '../state/store/store';
-import { fetchBook } from '../api/books';
+import useBookData from '../hooks/useBookData';
 
-type Book = {
-  id: string;
-  thumbnail: string;
-  title: string;
-  authors: string[];
-  average_rating: number;
-  ISBN10: string;
-  favorited: boolean;
-  status: string;
-  userbookID: string;
-  rating: number;
-  subtitle: string;
-  description: string;
-  publisher: string;
-  ISBN13: string;
-  length: number;
-  categories: string[];
-  userRating: number;
-};
 function BookPage() {
-  const router = useNavigate();
   const { id } = useParams();
-  const { data, isLoading, error, isSuccess } = useQuery({
-    queryKey: ['book', id],
-    queryFn: () => fetchBook(id),
-  });
+  const { data, isLoading, isSuccess } = useBookData(id);
 
-  // const [book, setBook] = useState<Book>({} as Book);
-  // const dispatch = useAppDispatch();
-  // useEffect(() => {
-  //   const initialSearch = async () => {
-  //     const res = await axios.get(`/api/books/${id}`);
-  //     if (!res.data.data.book) {
-  //       router('/home');
-  //     } else {
-  //       setBook(res.data.data.book);
-  //     }
-  //   };
-  //   initialSearch();
-  // }, [id, router]);
-  // if (isLoading) return <h1>Loading...</h1>;
-  // if (error) return <h1>Error...</h1>;
   return (
     <>
       <SearchBooks />
       <PageLayout>
-        {!isLoading && isSuccess ? (
+        {!isLoading && isSuccess && data ? (
           <Box>
             <BookCard
               key={data.id}
@@ -66,9 +24,9 @@ function BookPage() {
               imageUrl={data.thumbnail || ''}
               status={data.status}
               title={data.title}
-              author={data.authors?.length ? data.authors[0] : 'Unknown'}
+              author={data.authors.length ? data.authors[0] : 'Unknown'}
               rating={data.average_rating || 0}
-              userBookID={data.userbookID}
+              googleID={data.googleID}
               userRating={data.rating}
               favorited={data.favorited}
             />

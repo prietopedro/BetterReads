@@ -1,30 +1,22 @@
 import { Box } from '@chakra-ui/react';
-import { useEffect } from 'react';
 import HomeLibrary from '../components/HomeLibrary';
 import SearchBooks from '../components/SearchBooks';
+import useUserbooksData from '../hooks/useUserbooksData';
+import useUsershelvesData from '../hooks/useUsershelvesData';
 import PageLayout from '../layout/PageLayout';
-import {
-  favorites,
-  planned,
-  reading,
-  finished,
-  getBooks,
-} from '../state/store/features/userBookSlice';
-import { getShelves } from '../state/store/features/userShelfSlice';
-import { useAppDispatch, useAppSelector } from '../state/store/store';
 
 function ShelvesPage() {
-  const readingBooks = useAppSelector(reading);
-  const plannedBooks = useAppSelector(planned);
-  const favoriteBooks = useAppSelector(favorites);
-  const finishedBooks = useAppSelector(finished);
-  const dispatch = useAppDispatch();
-  const { shelves } = useAppSelector((state) => state.userShelves);
-  const { books } = useAppSelector((state) => state.userBooks);
-  useEffect(() => {
-    dispatch(getBooks());
-    dispatch(getShelves());
-  }, [dispatch]);
+  const {
+    data: userBooksData,
+    favoriteBooks,
+    plannedBooks,
+    readingBooks,
+    finishedBooks,
+  } = useUserbooksData();
+
+  const { data: shelvesData, isSuccess: shelvesIsSuccess } =
+    useUsershelvesData();
+
   return (
     <>
       <SearchBooks />
@@ -34,15 +26,19 @@ function ShelvesPage() {
         <HomeLibrary library="Reading" books={readingBooks} onlyImage />
         <HomeLibrary library="Finished" books={finishedBooks} onlyImage />
         <Box>
-          {shelves.map((x) => (
-            <HomeLibrary
-              key={x.id}
-              library={x.name}
-              books={books.filter((book) => x.books.includes(book.userbookID))}
-              id={x.id}
-              onlyImage
-            />
-          ))}
+          {shelvesIsSuccess &&
+            shelvesData?.map((x) => (
+              <HomeLibrary
+                key={x.id}
+                library={x.name}
+                books={
+                  userBooksData?.filter((book) => x.books.includes(book.id)) ||
+                  []
+                }
+                id={x.id}
+                onlyImage
+              />
+            ))}
         </Box>
       </PageLayout>
     </>

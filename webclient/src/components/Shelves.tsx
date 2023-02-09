@@ -1,17 +1,8 @@
 import { Box, Button, Text, Flex } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import {
-  favorites,
-  getBooks,
-  planned,
-  reading,
-} from '../state/store/features/userBookSlice';
-import { useAppDispatch, useAppSelector } from '../state/store/store';
+import { useState } from 'react';
 import CreateShelfModal from './CreateBookshelfModal';
-import { fetchUserBooks } from '../api/userbooks';
-import { fetchUserShelves } from '../api/usershelves';
+import useUserbooksData from '../hooks/useUserbooksData';
 
 function Shelves() {
   const navigate = useNavigate();
@@ -27,22 +18,8 @@ function Shelves() {
     />
   );
 
-  const { data, isLoading, error, isSuccess } = useQuery({
-    queryKey: ['userbooks'],
-    queryFn: () => fetchUserBooks(),
-  });
-  const favoriteBooks = useMemo(
-    () => (data ? data?.filter((book) => book.favorited) : []),
-    [data],
-  );
-  const plannedBooks = useMemo(
-    () => (data ? data?.filter((book) => book.status === 'planned') : []),
-    [data],
-  );
-  const readingBooks = useMemo(
-    () => (data ? data?.filter((book) => book.status === 'reading') : []),
-    [data],
-  );
+  const { isLoading, favoriteBooks, plannedBooks, readingBooks } =
+    useUserbooksData();
 
   if (isLoading) return <div>Loading...</div>;
   return (

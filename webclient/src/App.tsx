@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, CSSReset } from '@chakra-ui/react';
 import { Provider } from 'react-redux';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import theme from './styles/theme';
@@ -15,8 +15,8 @@ import ProtectedRoutes from './components/ProtectedRoutes';
 import Search from './pages/Search';
 import ShelvesPage from './pages/ShelvesPage';
 import BookPage from './pages/BookPage';
+import queryClient from './api/queryClient';
 
-const queryClient = new QueryClient();
 function App() {
   return (
     <BrowserRouter>

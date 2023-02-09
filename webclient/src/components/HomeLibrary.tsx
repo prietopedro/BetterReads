@@ -13,22 +13,10 @@ import ManageBookshelfModal from './ManageBookshelfModal';
 import { useAppDispatch } from '../state/store/store';
 import { deleteShelf } from '../state/store/features/userShelfSlice';
 import EditBookshelfModal from './EditBookshelfModal';
+import { Book } from '../api/userbooks';
 
 // import { EditShelfModal } from "./EditShelfModal";
 // import { ManageBookshelfModal } from "./ManageBookshelfModal";
-
-type Book = {
-  id: string;
-  thumbnail: string;
-  title: string;
-  authors: string[];
-  average_rating: number;
-  ISBN10: string;
-  favorited: boolean;
-  status: string;
-  userbookID: string;
-  rating: number;
-};
 
 type Props = {
   id?: string;
@@ -49,12 +37,12 @@ function HomeLibrary({ library, books, onlyImage = false, id = '' }: Props) {
         id={id}
         name={library}
       />
-      <ManageBookshelfModal
+      {/* <ManageBookshelfModal
         isOpen={addOpen}
         setIsOpen={setAddOpen}
         id={id}
         books={books}
-      />
+      /> */}
       <Flex justifyContent="space-between">
         <Flex w="90%" alignItems="center">
           <Text
@@ -107,12 +95,12 @@ function HomeLibrary({ library, books, onlyImage = false, id = '' }: Props) {
                 imageUrl={book.thumbnail || ''}
                 onlyImage={onlyImage}
                 title={book.title}
-                author={book.authors?.length ? book.authors[0] : 'Unknown'}
+                author={book.authors}
                 rating={book.average_rating || 0}
                 ISBN10={book.ISBN10}
                 status={book.status}
                 favorited={book.favorited}
-                userBookID={book.userbookID}
+                googleID={book.googleID}
                 userRating={book.rating}
               />
             );
