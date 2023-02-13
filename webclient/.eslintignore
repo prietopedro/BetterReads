@@ -1,0 +1,6 @@
+.eslintrc.js
+ios/
+android/
+*.config.js
+postcss.config.cjs
+tailwind.config.cjs
