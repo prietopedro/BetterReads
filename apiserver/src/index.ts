@@ -10,7 +10,7 @@ process.on("uncaughtException", err => {
     process.exit(1)
 })
 
-import { PORT } from "./config/constants.js";
+import { PORT, MONGO_DB_URL } from "./config/constants.js";
 import globalErrorHandler from "./controllers/errorController.js";
 import AppError from "./utils/appError.js";
 import userRouter from "./routes/userRoutes.js";
@@ -21,7 +21,7 @@ dotenv.config();
 
 
 mongoose
-    .connect('mongodb://root:example@mongo:27017/backend?authSource=admin')
+    .connect(MONGO_DB_URL)
     .then(() => console.log('DB connection successful!'));
 app.use(express.json({ limit: '10kb' }))
 app.use(cookieParser())
