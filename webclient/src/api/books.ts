@@ -41,11 +41,8 @@ export const fetchBook = async (id: string | undefined) => {
 };
 
 export const fetchBooks = async ({ page, search }: FetchBooksParams) => {
-  const url = new URL('api/books', 'http://localhost:3000');
-  url.searchParams.append('page', page.toString());
-  url.searchParams.append('search', search);
   const res = await axiosWithCredentials.get<BooksAxiosResponse>(
-    url.toString(),
+    `api/books?page=${page}&search=${search}`,
   );
   return res.data;
 };
