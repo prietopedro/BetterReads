@@ -1,6 +1,6 @@
 import { Box, Text, IconButton, Flex, Button, Heading } from '@chakra-ui/react';
 import { Formik, Form } from 'formik';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FaSearch } from 'react-icons/fa';
 
 import FormInput from './FormInput';

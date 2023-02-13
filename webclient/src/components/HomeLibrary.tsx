@@ -10,13 +10,9 @@ import {
 } from '@chakra-ui/react';
 import BookCard from './Bookcard';
 import ManageBookshelfModal from './ManageBookshelfModal';
-import { useAppDispatch } from '../state/store/store';
-import { deleteShelf } from '../state/store/features/userShelfSlice';
 import EditBookshelfModal from './EditBookshelfModal';
 import { Book } from '../api/userbooks';
-
-// import { EditShelfModal } from "./EditShelfModal";
-// import { ManageBookshelfModal } from "./ManageBookshelfModal";
+import useDeleteUsershelfData from '../hooks/useDeleteUsershelfData';
 
 type Props = {
   id?: string;
@@ -28,7 +24,7 @@ type Props = {
 function HomeLibrary({ library, books, onlyImage = false, id = '' }: Props) {
   const [editOpen, setEditOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
-  const dispatch = useAppDispatch();
+  const { deleteShelf } = useDeleteUsershelfData();
   return (
     <Box mt={2} borderBottom="1px solid rgb(217,217,217)">
       <EditBookshelfModal
@@ -37,12 +33,12 @@ function HomeLibrary({ library, books, onlyImage = false, id = '' }: Props) {
         id={id}
         name={library}
       />
-      {/* <ManageBookshelfModal
+      <ManageBookshelfModal
         isOpen={addOpen}
         setIsOpen={setAddOpen}
         id={id}
         books={books}
-      /> */}
+      />
       <Flex justifyContent="space-between">
         <Flex w="90%" alignItems="center">
           <Text
@@ -74,9 +70,7 @@ function HomeLibrary({ library, books, onlyImage = false, id = '' }: Props) {
                   Manage Books
                 </MenuItem>
                 <MenuItem onClick={() => setEditOpen(true)}>Update</MenuItem>
-                <MenuItem onClick={() => dispatch(deleteShelf(id))}>
-                  Delete
-                </MenuItem>
+                <MenuItem onClick={() => deleteShelf(id)}>Delete</MenuItem>
               </MenuList>
             </Menu>
           )}

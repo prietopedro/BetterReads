@@ -8,8 +8,7 @@ import {
   ModalCloseButton,
 } from '@chakra-ui/react';
 import { Formik, Form } from 'formik';
-import { editShelf } from '../state/store/features/userShelfSlice';
-import { useAppDispatch } from '../state/store/store';
+import useEditUsershelfData from '../hooks/useEditUsershelfData';
 import FormInput from './FormInput';
 
 type Props = {
@@ -20,7 +19,7 @@ type Props = {
 };
 
 function EditBookshelfModal({ isOpen, setIsOpen, id, name }: Props) {
-  const dispatch = useAppDispatch();
+  const { editShelf } = useEditUsershelfData();
   return (
     <Modal isOpen={isOpen} isCentered onClose={() => setIsOpen(false)}>
       <ModalOverlay />
@@ -31,7 +30,7 @@ function EditBookshelfModal({ isOpen, setIsOpen, id, name }: Props) {
           <Formik
             initialValues={{ name }}
             onSubmit={async (values) => {
-              dispatch(editShelf({ ...values, id }));
+              editShelf({ ...values, id });
               setIsOpen(false);
             }}
           >

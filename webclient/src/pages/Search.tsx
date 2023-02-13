@@ -1,4 +1,4 @@
-import { Flex, Button } from '@chakra-ui/react';
+import { Flex, Button, Spinner } from '@chakra-ui/react';
 import { useSearchParams } from 'react-router-dom';
 
 import SearchBooks from '../components/SearchBooks';
@@ -10,14 +10,16 @@ function Search() {
   const [searchParams] = useSearchParams();
   const name = searchParams.get('name');
 
-  const { data, isSuccess, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useBooksData(name);
 
-  if (isSuccess)
-    return (
-      <>
-        <SearchBooks />
-        <PageLayout>
+  return (
+    <>
+      <SearchBooks />
+      <PageLayout>
+        {isLoading ? (
+          <Spinner />
+        ) : (
           <Flex direction="row" justifyContent="space-between" flexWrap="wrap">
             {data &&
               data.pages.map((page) =>
@@ -61,10 +63,10 @@ function Search() {
               </Button>
             )}
           </Flex>
-        </PageLayout>
-      </>
-    );
-  return <div>HELLO</div>;
+        )}
+      </PageLayout>
+    </>
+  );
 }
 
 export default Search;

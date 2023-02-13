@@ -13,20 +13,9 @@ import {
   Checkbox,
   ModalFooter,
 } from '@chakra-ui/react';
-import { useAppDispatch, useAppSelector } from '../state/store/store';
-import { editShelf } from '../state/store/features/userShelfSlice';
-
-type Book = {
-  id: string;
-  thumbnail: string;
-  title: string;
-  authors: string[];
-  average_rating: number;
-  ISBN10: string;
-  favorited: boolean;
-  status: string;
-  userbookID: string;
-};
+import useUserbooksData from '../hooks/useUserbooksData';
+import { Book } from '../api/userbooks';
+import useEditUsershelfData from '../hooks/useEditUsershelfData';
 
 type Props = {
   isOpen: boolean;
@@ -41,14 +30,13 @@ function ManageBookshelfModal({
   id,
   books: currentBooks,
 }: Props) {
-  const { books } = useAppSelector((state) => state.userBooks);
-  const dispatch = useAppDispatch();
+  const { data: books } = useUserbooksData();
   const [booksChecked, setBooksChecked] = useState(new Map<string, boolean>());
-
+  const { editShelf } = useEditUsershelfData();
   useEffect(() => {
     const map = new Map<string, boolean>();
     currentBooks.forEach((x) => {
-      map.set(x.userbookID, true);
+      map.set(x.id, true);
     });
     setBooksChecked(map);
   }, [currentBooks]);
@@ -60,16 +48,16 @@ function ManageBookshelfModal({
         <ModalCloseButton onClick={() => setIsOpen(false)} />
         <ModalBody>
           <Box>
-            {books.length ? (
-              books.map((x) => {
+            {books?.length ? (
+              books?.map((x) => {
                 return (
-                  <Flex key={x.id}>
+                  <Flex key={x.googleID}>
                     <Checkbox
-                      name={x.userbookID}
+                      name={x.id}
                       size="md"
                       colorScheme="green"
                       color="green"
-                      isChecked={booksChecked.get(x.userbookID)}
+                      isChecked={booksChecked.get(x.id)}
                       onChange={(e) => {
                         if (e.target.checked) {
                           setBooksChecked(
@@ -96,7 +84,7 @@ function ManageBookshelfModal({
           <ModalFooter>
             <Button
               onClick={async () => {
-                dispatch(editShelf({ id, books: [...booksChecked.keys()] }));
+                editShelf({ id, books: [...booksChecked.keys()] });
                 setIsOpen(false);
               }}
             >

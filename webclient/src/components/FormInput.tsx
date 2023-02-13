@@ -8,9 +8,9 @@ import { FieldHookConfig, useField } from 'formik';
 
 type Props = { label: string } & FieldHookConfig<string>;
 function FormInput({ label, ...props }: Props) {
-  const [field, { error }] = useField(props);
+  const [field, { error, touched }] = useField(props);
   return (
-    <FormControl width="100%" isInvalid={!!error} mt="1rem">
+    <FormControl width="100%" isInvalid={!!error && touched} mt="1rem">
       {label && <FormLabel htmlFor={field.name}>{label}</FormLabel>}
       <Input
         {...field}
@@ -18,7 +18,7 @@ function FormInput({ label, ...props }: Props) {
         type={props.type}
         placeholder={props.placeholder}
       />
-      {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
+      {error && touched ? <FormErrorMessage>{error}</FormErrorMessage> : null}
     </FormControl>
   );
 }

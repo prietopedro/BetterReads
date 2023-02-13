@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { Box, Text, Heading, Flex, Tag } from '@chakra-ui/react';
+import { Box, Text, Heading, Flex, Tag, Spinner } from '@chakra-ui/react';
 
 import SearchBooks from '../components/SearchBooks';
 import BookCard from '../components/Bookcard';
@@ -148,7 +148,7 @@ function BookPage() {
             </Box>
           </Box>
         ) : (
-          <div>Loading...</div>
+          <Spinner />
         )}
       </PageLayout>
     </>

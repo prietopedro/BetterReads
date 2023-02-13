@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { Formik, Form } from 'formik';
-import { Button } from '@chakra-ui/react';
+import { Button, FormControl, FormErrorMessage } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import { object, ref, string } from 'yup';
 
-import { useAppSelector, useAppDispatch } from '../state/store/store';
-import { register, RegisterData } from '../state/store/features/userSlice';
 import FormInput from '../components/FormInput';
 import AuthWrapper from '../layout/AuthWrapper';
+import useAuth from '../hooks/useAuth';
 
 type RegisterForm = {
   name: '';
@@ -16,14 +16,12 @@ type RegisterForm = {
 };
 function Register() {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const { isLoading, isLoggedIn } = useAppSelector((state) => state.user);
+  const { isLoggedIn, register, registerError, registerIsLoading } = useAuth();
   const onSubmit = async (values: RegisterForm) => {
-    const registerData: RegisterData = {
+    register({
       email: values.email,
       password: values.password,
-    };
-    dispatch(register(registerData));
+    });
   };
 
   useEffect(() => {
@@ -46,9 +44,20 @@ function Register() {
             confirmPassword: '',
           } as RegisterForm
         }
+        validationSchema={object({
+          email: string()
+            .email('Please provide a valid email address')
+            .required('Email address is required'),
+          password: string().required('Password is required'),
+          name: string().required('Full name is required to register'),
+          confirmPassword: string().oneOf(
+            [ref('password')],
+            'Passwords must match',
+          ),
+        })}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting }) => (
+        <FormControl isInvalid={!!registerError}>
           <Form>
             <FormInput
               name="name"
@@ -72,19 +81,19 @@ function Register() {
               label="Confirm Password"
               type="password"
             />
+            <FormErrorMessage>{registerError}</FormErrorMessage>
             <Button
               type="submit"
-              isLoading={isSubmitting}
+              isLoading={registerIsLoading}
               width="100%"
               backgroundColor="teal.400"
               color="white"
               mt="1rem"
-              disabled={isLoading}
             >
               Register
             </Button>
           </Form>
-        )}
+        </FormControl>
       </Formik>
     </AuthWrapper>
   );

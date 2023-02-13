@@ -10,14 +10,11 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
 import Wrapper from '../layout/Wrapper';
-import { useAppSelector, useAppDispatch } from '../state/store/store';
-import { logout } from '../state/store/features/userSlice';
+import useAuth from '../hooks/useAuth';
 
 function Navbar() {
   const router = useNavigate();
-  const dispatch = useAppDispatch();
-  const { isLoggedIn } = useAppSelector((state) => state.user);
-  // const isAuth = useAuth();
+  const { isLoggedIn, logout } = useAuth();
   let body = null;
   if (isLoggedIn) {
     body = (
@@ -28,6 +25,7 @@ function Navbar() {
             color="#333"
             textDecoration="none"
             cursor="pointer"
+            data-testid="navbar-home-text"
           >
             Home
           </Text>
@@ -38,8 +36,9 @@ function Navbar() {
           </MenuButton>
           <MenuList>
             <MenuItem
+              data-testid="navbar-logout-text"
               onClick={async () => {
-                dispatch(logout());
+                logout();
                 router('/');
               }}
             >
@@ -52,23 +51,25 @@ function Navbar() {
   } else {
     body = (
       <>
-        <Link to="/register">
+        <Link to="/register" data-testid="navbar-register-link">
           <Text
             fontSize="1.2rem"
             color="#333"
             textDecoration="none"
             cursor="pointer"
+            data-testid="navbar-register-text"
           >
             Register
           </Text>
         </Link>
-        <Link to="/login">
+        <Link to="/login" data-testid="navbar-login-link">
           <Text
             fontSize="1.2rem"
             color="#333"
             textDecoration="none"
             cursor="pointer"
             ml={6}
+            data-testid="navbar-login-text"
           >
             Login
           </Text>
@@ -79,14 +80,15 @@ function Navbar() {
   return (
     <Box>
       <Wrapper variant="regular" centered>
-        <Flex justify="space-between" align="center">
-          <Link to="/">
+        <Flex justify="space-between" align="center" data-test-id="navbar">
+          <Link to="/" data-testid="navbar-logo-link">
             <Text
               fontSize="1.6rem"
               fontWeight={700}
               color="teal.400"
               textDecoration="none"
               cursor="pointer"
+              data-testid="navbar-logo-text"
             >
               BetterReads
             </Text>

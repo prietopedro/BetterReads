@@ -1,11 +1,8 @@
-import { useEffect } from 'react';
-import { Outlet, Navigate, useNavigate } from 'react-router-dom';
-
-import { useAppSelector } from '../state/store/store';
+import { Outlet, Navigate } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
 
 function ProtectedRoutes() {
-  const navigate = useNavigate();
-  const isLoggedIn = useAppSelector((state) => state.user.isLoggedIn);
+  const { isLoggedIn } = useAuth();
   return isLoggedIn ? <Outlet /> : <Navigate to="/" />;
 }
 

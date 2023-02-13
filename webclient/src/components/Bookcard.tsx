@@ -8,25 +8,14 @@ import {
   MenuList,
   MenuItem,
   Icon,
-  Button,
 } from '@chakra-ui/react';
-import { useMutation } from '@tanstack/react-query';
 import { FaStar, FaHeart, FaChevronDown } from 'react-icons/fa';
-import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { BooksAxiosResponse } from '../api/books';
-import queryClient from '../api/queryClient';
-import {
-  AddUserBook,
-  addUserBook,
-  deleteUserBook,
-  EditUserBook,
-  editUserBook,
-} from '../api/userbooks';
-import // editBook,
-// addBook,
-// deleteBook,
-'../state/store/features/userBookSlice';
-import { useAppSelector } from '../state/store/store';
+import useAddUserbookData from '../hooks/useAddUserbookData';
+import useAuth from '../hooks/useAuth';
+import useDeleteUserbookData from '../hooks/useDeleteUserbookData';
+import useEditUserbookData from '../hooks/useEditUserbookData';
 
 type Props = {
   id: string;
@@ -49,147 +38,13 @@ export interface InfiniteBooks {
 
 function BookCard({ onlyImage = false, ...props }: Props) {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { isLoggedIn } = useAppSelector((state) => state.user);
+  const { isLoggedIn } = useAuth();
   const actualRating = props.userRating ? props.userRating : props.rating;
   const actualRatingColor = props.userRating ? '#b59919' : '#EA7258';
-  const name = searchParams.get('name');
-  const { id: bookID } = useParams();
 
-  const { mutate: deleteBook } = useMutation({
-    mutationFn: (id: string) => deleteUserBook(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userbooks'] });
-    },
-    onMutate: (variables) => {
-      const bookPageData = queryClient.getQueryData(['book', bookID]);
-      if (bookPageData) {
-        queryClient.setQueryData(['book', bookID], {
-          ...bookPageData,
-          status: '',
-          favorited: false,
-          id: '',
-          rating: '',
-        });
-      }
-
-      const bookSearchData = queryClient.getQueryData<InfiniteBooks>([
-        'books',
-        name,
-      ]);
-      if (bookSearchData) {
-        const newData = {
-          ...bookSearchData,
-          pages: bookSearchData.pages.map((page) => ({
-            ...page,
-            data: page.data.map((book) => {
-              if (book.id === variables)
-                return {
-                  ...book,
-                  status: '',
-                  favorited: false,
-                  id: '',
-                  rating: '',
-                };
-              return book;
-            }),
-          })),
-        };
-        queryClient.setQueryData(['books', name], newData);
-      }
-    },
-  });
-  const { mutate: editBook, isLoading: editLoading } = useMutation({
-    mutationFn: (params: EditUserBook) => editUserBook(params),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userbooks'] });
-    },
-    onMutate: (variables) => {
-      const bookPageData = queryClient.getQueryData(['book', bookID]);
-      if (bookPageData) {
-        queryClient.setQueryData(['book', bookID], {
-          ...bookPageData,
-          ...variables,
-        });
-      }
-
-      const bookSearchData = queryClient.getQueryData<InfiniteBooks>([
-        'books',
-        name,
-      ]);
-      if (bookSearchData) {
-        const newData = {
-          ...bookSearchData,
-          pages: bookSearchData.pages.map((page) => ({
-            ...page,
-            data: page.data.map((book) => {
-              if (book.id === variables.userbookID)
-                return { ...book, ...variables };
-              return book;
-            }),
-          })),
-        };
-        queryClient.setQueryData(['books', name], newData);
-      }
-    },
-  });
-
-  const { mutate: addBook } = useMutation({
-    mutationFn: (params: AddUserBook) => addUserBook(params),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['userbooks'] });
-      const bookSearchData = queryClient.getQueryData<InfiniteBooks>([
-        'books',
-        name,
-      ]);
-      if (bookSearchData) {
-        const newData = {
-          ...bookSearchData,
-          pages: bookSearchData.pages.map((page) => ({
-            ...page,
-            data: page.data.map((book) => {
-              if (book.googleID === data.googleID) return data;
-              return book;
-            }),
-          })),
-        };
-        queryClient.setQueryData(['books', name], newData);
-      }
-    },
-    onMutate: (variables) => {
-      const bookPageData = queryClient.getQueryData(['book', bookID]);
-      if (bookPageData) {
-        queryClient.setQueryData(['book', bookID], {
-          ...bookPageData,
-          ...variables,
-        });
-      }
-
-      const bookSearchData = queryClient.getQueryData<InfiniteBooks>([
-        'books',
-        name,
-      ]);
-      if (bookSearchData) {
-        const newData = {
-          ...bookSearchData,
-          pages: bookSearchData.pages.map((page) => ({
-            ...page,
-            data: page.data.map((book) => {
-              if (book.googleID === variables.googleID)
-                return {
-                  ...book,
-                  ...variables,
-                  status: variables.status || 'planned',
-                  favorited: variables.favorited || false,
-                };
-              return book;
-            }),
-          })),
-        };
-        queryClient.setQueryData(['books', name], newData);
-      }
-    },
-  });
+  const { deleteBook } = useDeleteUserbookData();
+  const { editBook } = useEditUserbookData();
+  const { addBook } = useAddUserbookData();
 
   return (
     <Flex
@@ -212,6 +67,7 @@ function BookCard({ onlyImage = false, ...props }: Props) {
         <Menu>
           <MenuButton
             width="100%"
+            data-testid="BookCard-Current-Status"
             color="white"
             backgroundColor="teal.400"
             borderRadius="none"
@@ -303,12 +159,17 @@ function BookCard({ onlyImage = false, ...props }: Props) {
             cursor="pointer"
             fontSize="1rem"
             fontFamily="Frank Ruhl Libre"
+            data-testid="BookCard-Title"
           >
             {props.title?.length > 70
               ? `${props.title.substring(0, 70)} ...`
               : props.title}
           </Heading>
-          <Text fontSize="0.875rem" fontFamily="Frank Ruhl Libre">
+          <Text
+            fontSize="0.875rem"
+            fontFamily="Frank Ruhl Libre"
+            data-testid="BookCard-Author"
+          >
             {props.author}
           </Text>
           <Flex>
@@ -350,12 +211,12 @@ function BookCard({ onlyImage = false, ...props }: Props) {
       )}
       {!onlyImage && (
         <Flex width="10%" ml="auto" justifyContent="flex-end">
-          <Button
+          <Box
             as={FaHeart}
             size="1.5rem"
+            data-testid="BookCard-Favorite"
             fill={!props.favorited ? 'grey' : '#EA7258'}
             cursor="pointer"
-            isLoading={editLoading}
             onClick={() => {
               if (!isLoggedIn) {
                 navigate('/login');

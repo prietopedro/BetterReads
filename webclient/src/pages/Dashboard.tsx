@@ -1,3 +1,4 @@
+import { Spinner } from '@chakra-ui/react';
 import HomeLibrary from '../components/HomeLibrary';
 import SearchBooks from '../components/SearchBooks';
 import useUserbooksData from '../hooks/useUserbooksData';
@@ -11,7 +12,9 @@ function Dashboard() {
     <>
       <SearchBooks />
       <PageLayout>
-        {!isLoading && (
+        {isLoading ? (
+          <Spinner />
+        ) : (
           <>
             <HomeLibrary library="Planned" books={plannedBooks} />
             <HomeLibrary library="Reading" books={readingBooks} />

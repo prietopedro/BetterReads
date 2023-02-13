@@ -8,11 +8,9 @@ import {
   ModalCloseButton,
 } from '@chakra-ui/react';
 import { Formik, Form } from 'formik';
-// import { toErrorMap } from "../utils/toErrorMap";
 import { useLocation, useNavigate } from 'react-router-dom';
 import FormInput from './FormInput';
-import { useAppDispatch } from '../state/store/store';
-import { addShelf } from '../state/store/features/userShelfSlice';
+import useAddUsershelfData from '../hooks/useAddUsershelfData';
 
 type Props = {
   isOpen: boolean;
@@ -22,7 +20,9 @@ type Props = {
 function CreateBookshelfModal({ isOpen, setIsOpen }: Props) {
   const router = useNavigate();
   const location = useLocation();
-  const dispatch = useAppDispatch();
+
+  const { addShelf } = useAddUsershelfData();
+
   return (
     <Modal isOpen={isOpen} isCentered onClose={() => setIsOpen(false)}>
       <ModalOverlay />
@@ -33,7 +33,7 @@ function CreateBookshelfModal({ isOpen, setIsOpen }: Props) {
           <Formik
             initialValues={{ name: '' }}
             onSubmit={async (values) => {
-              dispatch(addShelf(values.name));
+              addShelf(values.name);
               setIsOpen(false);
               if (location.pathname !== '/shelves') router('/shelves');
             }}

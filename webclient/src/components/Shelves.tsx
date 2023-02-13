@@ -1,4 +1,4 @@
-import { Box, Button, Text, Flex } from '@chakra-ui/react';
+import { Box, Button, Text, Flex, Spinner } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import CreateShelfModal from './CreateBookshelfModal';
@@ -21,7 +21,6 @@ function Shelves() {
   const { isLoading, favoriteBooks, plannedBooks, readingBooks } =
     useUserbooksData();
 
-  if (isLoading) return <div>Loading...</div>;
   return (
     <>
       <CreateShelfModal
@@ -61,101 +60,105 @@ function Shelves() {
         >
           Create new shelf
         </Button>
-        <Flex flexDirection={['row', 'row', 'row', 'column']} mt="1rem">
-          <Flex
-            border="1px solid rgb(217,217,217)"
-            w="60%"
-            mt="1rem"
-            p="0.5rem 1rem"
-            direction="column"
-            justify="space-between"
-            alignItems="center"
-          >
-            <Text>Reading</Text>
-            <Flex justify="center">
-              {readingBooks?.length
-                ? readingBooks
-                    .filter((_, i) => i < 2)
-                    .map((x, i) => {
-                      return (
-                        <Box
-                          key={(x.toString() + i).toString()}
-                          mx="0.5rem"
-                          onClick={() => navigate(`/book/${x.id}`)}
-                          cursor="pointer"
-                          background={`url(${x.thumbnail}) no-repeat center /cover`}
-                          width="50px"
-                          height="69px"
-                        />
-                      );
-                    })
-                : defaultValue}
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <Flex flexDirection={['row', 'row', 'row', 'column']} mt="1rem">
+            <Flex
+              border="1px solid rgb(217,217,217)"
+              w="60%"
+              mt="1rem"
+              p="0.5rem 1rem"
+              direction="column"
+              justify="space-between"
+              alignItems="center"
+            >
+              <Text>Reading</Text>
+              <Flex justify="center">
+                {readingBooks?.length
+                  ? readingBooks
+                      .filter((_, i) => i < 2)
+                      .map((x, i) => {
+                        return (
+                          <Box
+                            key={(x.toString() + i).toString()}
+                            mx="0.5rem"
+                            onClick={() => navigate(`/book/${x.id}`)}
+                            cursor="pointer"
+                            background={`url(${x.thumbnail}) no-repeat center /cover`}
+                            width="50px"
+                            height="69px"
+                          />
+                        );
+                      })
+                  : defaultValue}
+              </Flex>
+              <Text>{readingBooks?.length || 0} Books</Text>
             </Flex>
-            <Text>{readingBooks?.length || 0} Books</Text>
-          </Flex>
-          <Flex
-            border="1px solid rgb(217,217,217)"
-            w="60%"
-            mt="1rem"
-            p="0.5rem 1rem"
-            direction="column"
-            justify="space-between"
-            alignItems="center"
-          >
-            <Text color="#333">Planned</Text>
-            <Flex justify="center">
-              {plannedBooks?.length
-                ? plannedBooks
-                    .filter((_, i) => i < 2)
-                    .map((x, i) => {
-                      return (
-                        <Box
-                          key={(x.toString() + i).toString()}
-                          mx="0.5rem"
-                          onClick={() => navigate(`/book/${x.id}`)}
-                          cursor="pointer"
-                          background={`url(${x.thumbnail}) no-repeat center /cover`}
-                          width="50px"
-                          height="69px"
-                        />
-                      );
-                    })
-                : defaultValue}
+            <Flex
+              border="1px solid rgb(217,217,217)"
+              w="60%"
+              mt="1rem"
+              p="0.5rem 1rem"
+              direction="column"
+              justify="space-between"
+              alignItems="center"
+            >
+              <Text color="#333">Planned</Text>
+              <Flex justify="center">
+                {plannedBooks?.length
+                  ? plannedBooks
+                      .filter((_, i) => i < 2)
+                      .map((x, i) => {
+                        return (
+                          <Box
+                            key={(x.toString() + i).toString()}
+                            mx="0.5rem"
+                            onClick={() => navigate(`/book/${x.id}`)}
+                            cursor="pointer"
+                            background={`url(${x.thumbnail}) no-repeat center /cover`}
+                            width="50px"
+                            height="69px"
+                          />
+                        );
+                      })
+                  : defaultValue}
+              </Flex>
+              <Text>{plannedBooks?.length || 0} Books</Text>
             </Flex>
-            <Text>{plannedBooks?.length || 0} Books</Text>
-          </Flex>
-          <Flex
-            border="1px solid rgb(217,217,217)"
-            w="60%"
-            mt="1rem"
-            p="0.5rem 1rem"
-            direction="column"
-            justify="space-between"
-            alignItems="center"
-          >
-            <Text>Favorites</Text>
-            <Flex justify="center">
-              {favoriteBooks.length
-                ? favoriteBooks
-                    ?.filter((_, i) => i < 2)
-                    .map((x, i) => {
-                      return (
-                        <Box
-                          key={(x.toString() + i).toString()}
-                          mx="0.5rem"
-                          onClick={() => navigate(`/book/${x.id}`)}
-                          cursor="pointer"
-                          background={`url(${x.thumbnail}) no-repeat center /cover`}
-                          width="50px"
-                          height="69px"
-                        />
-                      );
-                    })
-                : defaultValue}
+            <Flex
+              border="1px solid rgb(217,217,217)"
+              w="60%"
+              mt="1rem"
+              p="0.5rem 1rem"
+              direction="column"
+              justify="space-between"
+              alignItems="center"
+            >
+              <Text>Favorites</Text>
+              <Flex justify="center">
+                {favoriteBooks.length
+                  ? favoriteBooks
+                      ?.filter((_, i) => i < 2)
+                      .map((x, i) => {
+                        return (
+                          <Box
+                            key={(x.toString() + i).toString()}
+                            mx="0.5rem"
+                            onClick={() => navigate(`/book/${x.id}`)}
+                            cursor="pointer"
+                            background={`url(${x.thumbnail}) no-repeat center /cover`}
+                            width="50px"
+                            height="69px"
+                          />
+                        );
+                      })
+                  : defaultValue}
+              </Flex>
+              <Text>{favoriteBooks.length || 0} Books</Text>
             </Flex>
-            <Text>{favoriteBooks.length || 0} Books</Text>
           </Flex>
-        </Flex>
+        )}
       </Flex>
     </>
   );
