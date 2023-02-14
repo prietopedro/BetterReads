@@ -1,21 +1,15 @@
-import {
-  Box,
-  Flex,
-  Heading,
-  Text,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Icon,
-} from '@chakra-ui/react';
-import { FaStar, FaHeart, FaChevronDown } from 'react-icons/fa';
+import { Box, Flex } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { BooksAxiosResponse } from '../api/books';
 import useAddUserbookData from '../hooks/useAddUserbookData';
 import useAuth from '../hooks/useAuth';
 import useDeleteUserbookData from '../hooks/useDeleteUserbookData';
 import useEditUserbookData from '../hooks/useEditUserbookData';
+import BookcardHeading from './Bookcard/BookcardHeading';
+import BookcardRating from './Bookcard/BookcardRating';
+import BookcardStatusMenu from './Bookcard/BookcardStatusMenu';
+import FavoriteIcon from './Bookcard/FavoriteIcon';
+import { BookAction } from './Bookcard/types';
 
 type Props = {
   id: string;
@@ -39,12 +33,23 @@ export interface InfiniteBooks {
 function BookCard({ onlyImage = false, ...props }: Props) {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
-  const actualRating = props.userRating ? props.userRating : props.rating;
-  const actualRatingColor = props.userRating ? '#b59919' : '#EA7258';
-
   const { deleteBook } = useDeleteUserbookData();
   const { editBook } = useEditUserbookData();
   const { addBook } = useAddUserbookData();
+  const addOrEditOrRedirect = (info: BookAction) => {
+    if (!isLoggedIn) navigate('/login');
+    else if (!props.id)
+      addBook({
+        googleID: props.googleID,
+        ...info,
+      });
+    else {
+      editBook({
+        userbookID: props.id,
+        ...info,
+      });
+    }
+  };
 
   return (
     <Flex
@@ -64,176 +69,31 @@ function BookCard({ onlyImage = false, ...props }: Props) {
             width="86px"
           />
         </Box>
-        <Menu>
-          <MenuButton
-            width="100%"
-            data-testid="BookCard-Current-Status"
-            color="white"
-            backgroundColor="teal.400"
-            borderRadius="none"
-            fontSize="0.8rem"
-            height="30px"
-            // rightIcon={<FaChevronDown />}
-          >
-            {(props.status &&
-              props.status.charAt(0).toUpperCase() + props.status.slice(1)) ||
-              'Track This'}
-            <Icon fontSize={16}>
-              <FaChevronDown />
-            </Icon>
-          </MenuButton>
-          <MenuList>
-            <MenuItem
-              onClick={() => {
-                if (!isLoggedIn) {
-                  navigate('/login');
-                } else if (!props.id) {
-                  addBook({
-                    googleID: props.googleID,
-                    status: 'planned',
-                  });
-                } else {
-                  editBook({
-                    userbookID: props.id,
-                    status: 'planned',
-                  });
-                }
-              }}
-            >
-              Planned
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                if (!isLoggedIn) {
-                  navigate('/login');
-                } else if (!props.id) {
-                  addBook({
-                    googleID: props.googleID,
-                    status: 'reading',
-                  });
-                } else {
-                  editBook({
-                    userbookID: props.id,
-                    status: 'reading',
-                  });
-                }
-              }}
-            >
-              Reading
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                if (!isLoggedIn) {
-                  navigate('/login');
-                } else if (!props.id) {
-                  addBook({
-                    googleID: props.googleID,
-                    status: 'finished',
-                  });
-                } else {
-                  editBook({
-                    userbookID: props.id,
-                    status: 'finished',
-                  });
-                }
-              }}
-            >
-              Finished
-            </MenuItem>
-            {props.id && (
-              <MenuItem
-                onClick={async () => {
-                  deleteBook(props.id);
-                }}
-              >
-                Remove
-              </MenuItem>
-            )}
-          </MenuList>
-        </Menu>
+        <BookcardStatusMenu
+          statusOnClickHandler={addOrEditOrRedirect}
+          deleteOnClickHandler={() => deleteBook(props.id)}
+          status={props.status}
+        />
       </Box>
       {!onlyImage && (
         <Box ml="1rem">
-          <Heading
-            onClick={() => navigate(`/book/${props.googleID}`)}
-            cursor="pointer"
-            fontSize="1rem"
-            fontFamily="Frank Ruhl Libre"
-            data-testid="BookCard-Title"
-          >
-            {props.title?.length > 70
-              ? `${props.title.substring(0, 70)} ...`
-              : props.title}
-          </Heading>
-          <Text
-            fontSize="0.875rem"
-            fontFamily="Frank Ruhl Libre"
-            data-testid="BookCard-Author"
-          >
-            {props.author}
-          </Text>
-          <Flex>
-            {Array(5)
-              .fill(0)
-              .map((_, i) => {
-                return (
-                  <Box
-                    key={String(_ + i)}
-                    as={FaStar}
-                    size="1.25rem"
-                    cursor="pointer"
-                    color={
-                      actualRating && Math.round(actualRating) >= i + 1
-                        ? actualRatingColor
-                        : '#E8E8E8'
-                    }
-                    pr=".125rem"
-                    onClick={() => {
-                      if (!isLoggedIn) {
-                        navigate('/login');
-                      } else if (!props.id) {
-                        addBook({
-                          googleID: props.googleID,
-                          rating: i + 1,
-                        });
-                      } else {
-                        editBook({
-                          userbookID: props.id,
-                          rating: i + 1,
-                        });
-                      }
-                    }}
-                  />
-                );
-              })}
-          </Flex>
+          <BookcardHeading
+            title={props.title}
+            author={props.author}
+            googleID={props.googleID}
+          />
+          <BookcardRating
+            rating={props.userRating ? props.userRating : props.rating}
+            isUserRating={!!props.userRating}
+            onClickHandler={addOrEditOrRedirect}
+          />
         </Box>
       )}
       {!onlyImage && (
-        <Flex width="10%" ml="auto" justifyContent="flex-end">
-          <Box
-            as={FaHeart}
-            size="1.5rem"
-            data-testid="BookCard-Favorite"
-            fill={!props.favorited ? 'grey' : '#EA7258'}
-            cursor="pointer"
-            onClick={() => {
-              if (!isLoggedIn) {
-                navigate('/login');
-              } else if (!props.id) {
-                addBook({
-                  googleID: props.googleID,
-                  favorited: true,
-                });
-              } else {
-                editBook({
-                  userbookID: props.id,
-                  favorited: !props.favorited,
-                });
-              }
-            }}
-          />
-        </Flex>
+        <FavoriteIcon
+          favorited={props.favorited}
+          onClickHandler={addOrEditOrRedirect}
+        />
       )}
     </Flex>
   );
