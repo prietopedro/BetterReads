@@ -36,7 +36,7 @@ const addUserBook = catchAsync( async (req: ProtectedRequest, res: Response) => 
         status: req.body.status, 
         googleID: req.body.googleID, 
         title: googleBook.volumeInfo?.title,
-        authors: googleBook.volumeInfo?.authors?.length ? googleBook.volumeInfo?.authors[0] : "Unknown",
+        authors: googleBook.volumeInfo?.authors || [],
         average_rating: googleBook.volumeInfo?.averageRating,
         thumbnail: googleBook.volumeInfo?.imageLinks?.thumbnail
     })

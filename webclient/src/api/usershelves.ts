@@ -1,22 +1,9 @@
+import {
+  EditShelf,
+  UserShelfAxiosResponse,
+  UserShelvesAxiosResponse,
+} from '../types';
 import axiosWithCredentials from './axios';
-
-export type Shelf = {
-  id: string;
-  name: string;
-  books: string[];
-};
-type UserShelvesAxiosResponse = {
-  data: { shelves: Shelf[] };
-};
-type UserShelfAxiosResponse = {
-  data: { shelf: Shelf };
-};
-
-export type EditShelf = {
-  id: string;
-  name?: string;
-  books?: string[];
-};
 
 export const fetchUserShelves = async () => {
   const res = await axiosWithCredentials.get<UserShelvesAxiosResponse>(

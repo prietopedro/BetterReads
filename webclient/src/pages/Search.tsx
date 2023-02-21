@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import SearchBooks from '../components/SearchBooks';
 import PageLayout from '../layout/PageLayout';
-import BookCard from '../components/Bookcard';
+import BookCard from '../components/Bookcard/Bookcard';
 import useBooksData from '../hooks/useBooksData';
 
 function Search() {
@@ -25,22 +25,9 @@ function Search() {
               data.pages.map((page) =>
                 page.data.map((book, i) => (
                   <BookCard
-                    id={book.id}
                     key={book.id + i.toString()}
-                    imageUrl={book.thumbnail || ''}
                     onlyImage={false}
-                    title={book.title}
-                    author={
-                      Array.isArray(book.authors)
-                        ? book.authors[0]
-                        : book.authors
-                    }
-                    rating={book.average_rating || 0}
-                    ISBN10={book.ISBN10}
-                    status={book.status}
-                    favorited={book.favorited}
-                    googleID={book.googleID}
-                    userRating={book.rating}
+                    book={book}
                   />
                 )),
               )}

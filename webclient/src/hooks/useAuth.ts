@@ -2,14 +2,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import queryClient from '../api/queryClient';
-import {
-  getMe,
-  LoginData,
-  RegisterData,
-  userLogin,
-  userLogout,
-  userRegister,
-} from '../api/user';
+import { getMe, userLogin, userLogout, userRegister } from '../api/user';
+import { LoginData, RegisterData } from '../types';
 import useLocalStorage from './useLocalStorage';
 
 function useAuth() {

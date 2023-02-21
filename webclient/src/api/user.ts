@@ -1,13 +1,6 @@
+import { LoginData, RegisterData } from '../types';
 import axiosWithCredentials from './axios';
 
-export type LoginData = {
-  email: string;
-  password: string;
-};
-export type RegisterData = {
-  email: string;
-  password: string;
-};
 export const userLogin = async ({ email, password }: LoginData) => {
   const res = await axiosWithCredentials.post('api/users/login', {
     email,

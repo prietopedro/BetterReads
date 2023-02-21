@@ -14,6 +14,7 @@ import Search from './pages/Search';
 import ShelvesPage from './pages/ShelvesPage';
 import BookPage from './pages/BookPage';
 import queryClient from './api/queryClient';
+import BaseAuthModal from './features/auth/layout/BaseAuthModal';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
               </Route>
             </Route>
             <Route path="/login" element={<Login />} />
+            <Route path="/test" element={<BaseAuthModal />} />
             <Route path="/register" element={<Register />} />
           </Routes>
         </ThemeProvider>

@@ -1,37 +1,10 @@
+import {
+  AddUserBook,
+  EditUserBook,
+  UserBookAxiosResponse,
+  UserBooksAxiosResponse,
+} from '../types';
 import axiosWithCredentials from './axios';
-
-export type Book = {
-  id: string;
-  thumbnail: string;
-  title: string;
-  authors: string;
-  average_rating: number;
-  ISBN10: string;
-  favorited: boolean;
-  status: string;
-  googleID: string;
-  rating: number;
-  userRating: number;
-};
-export type EditUserBook = {
-  userbookID: string;
-  rating?: number;
-  favorited?: boolean;
-  status?: string;
-};
-export type AddUserBook = {
-  googleID: string;
-  rating?: number;
-  favorited?: boolean;
-  status?: string;
-};
-
-type UserBooksAxiosResponse = {
-  data: { books: Book[] };
-};
-type UserBookAxiosResponse = {
-  data: { book: Book };
-};
 
 export const fetchUserBooks = async () => {
   const res = await axiosWithCredentials.get<UserBooksAxiosResponse>(

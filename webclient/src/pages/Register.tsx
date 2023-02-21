@@ -4,7 +4,7 @@ import { Button, FormControl, FormErrorMessage } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { object, ref, string } from 'yup';
 
-import FormInput from '../components/FormInput';
+import FormInput from '../components/HTMLElements/FormInput';
 import AuthWrapper from '../layout/AuthWrapper';
 import useAuth from '../hooks/useAuth';
 

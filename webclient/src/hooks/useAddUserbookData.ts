@@ -1,15 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { BooksAxiosResponse } from '../api/books';
 import queryClient from '../api/queryClient';
-import { addUserBook, AddUserBook } from '../api/userbooks';
+import { addUserBook } from '../api/userbooks';
+import { AddUserBook, InfiniteBooks } from '../types';
 import useErrorToast from './useErrorToast';
-
-export interface InfiniteBooks {
-  pages: BooksAxiosResponse[];
-  pageParams: string;
-}
 
 function useAddUserbookData() {
   const errorToast = useErrorToast();

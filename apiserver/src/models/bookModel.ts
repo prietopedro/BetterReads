@@ -9,7 +9,7 @@ export interface IBook extends Document {
     googleID: string;
     title: string;
     thumbnail: string;
-    authors: string;
+    authors: string[];
     average_rating: number;
     save: () => Promise<any>
   }
@@ -33,7 +33,7 @@ const bookSchema = new mongoose.Schema({
     },
     title: String,
     thumbnail: String,
-    authors: String,
+    authors: [String],
     average_rating: Number,
 })
 bookSchema.index({ user: 1, googleID: 1 }, { unique: true })

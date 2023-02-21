@@ -13,9 +13,9 @@ import {
   Checkbox,
   ModalFooter,
 } from '@chakra-ui/react';
-import useUserbooksData from '../hooks/useUserbooksData';
-import { Book } from '../api/userbooks';
-import useEditUsershelfData from '../hooks/useEditUsershelfData';
+import useUserbooksData from '../../hooks/useUserbooksData';
+import { Book } from '../../types';
+import useEditUsershelfData from '../../hooks/useEditUsershelfData';
 
 type Props = {
   isOpen: boolean;

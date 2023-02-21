@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import queryClient from '../api/queryClient';
-import { EditShelf, editUserShelf } from '../api/usershelves';
+import { editUserShelf } from '../api/usershelves';
+import { EditShelf } from '../types';
 import useErrorToast from './useErrorToast';
 
 function useEditUsershelfData() {

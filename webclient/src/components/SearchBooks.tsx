@@ -3,7 +3,7 @@ import { Formik, Form } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import { FaSearch } from 'react-icons/fa';
 
-import FormInput from './FormInput';
+import FormInput from './HTMLElements/FormInput';
 import Wrapper from '../layout/Wrapper';
 
 function SearchBooks() {

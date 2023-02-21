@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { Box, Text, Heading, Flex, Tag, Spinner } from '@chakra-ui/react';
 
 import SearchBooks from '../components/SearchBooks';
-import BookCard from '../components/Bookcard';
+import BookCard from '../components/Bookcard/Bookcard';
 import PageLayout from '../layout/PageLayout';
 import useBookData from '../hooks/useBookData';
 
@@ -16,20 +16,7 @@ function BookPage() {
       <PageLayout>
         {!isLoading && isSuccess && data ? (
           <Box>
-            <BookCard
-              key={data.id}
-              id={data.id}
-              onlyImage={false}
-              ISBN10={data.ISBN10}
-              imageUrl={data.thumbnail || ''}
-              status={data.status}
-              title={data.title}
-              author={data.authors.length ? data.authors[0] : 'Unknown'}
-              rating={data.average_rating || 0}
-              googleID={data.googleID}
-              userRating={data.rating}
-              favorited={data.favorited}
-            />
+            <BookCard key={data.id} onlyImage={false} book={data} />
             <Box borderBottom="1px solid rgb(217,217,217)" pb="1rem">
               <Heading
                 fontSize="1.3rem"
@@ -83,9 +70,7 @@ function BookPage() {
                     Author(s):
                   </Text>
                   <Box>
-                    {data.authors?.length
-                      ? data.authors?.map((x) => <Text key={x}>{x}</Text>)
-                      : 'Unknown'}
+                    <Text>{data.authors}</Text>
                   </Box>
                 </Flex>
                 <Flex flexWrap="wrap">

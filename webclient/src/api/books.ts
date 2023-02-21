@@ -1,37 +1,9 @@
 import axiosWithCredentials from './axios';
-import { Book } from './userbooks';
-
-export type BookWithDetails = {
-  id: string;
-  thumbnail: string;
-  title: string;
-  authors: string[];
-  average_rating: number;
-  ISBN10: string;
-  favorited: boolean;
-  status: string;
-  googleID: string;
-  rating: number;
-  subtitle: string;
-  description: string;
-  publisher: string;
-  ISBN13: string;
-  length: number;
-  categories: string[];
-  userRating: number;
-};
-export type FetchBooksParams = {
-  page: number;
-  search: string;
-};
-type BookWithDetailsAxiosResponse = {
-  data: { book: BookWithDetails };
-};
-
-export type BooksAxiosResponse = {
-  data: Book[];
-  totalItems: number;
-};
+import {
+  FetchBooksParams,
+  BookWithDetailsAxiosResponse,
+  BooksAxiosResponse,
+} from '../types';
 
 export const fetchBook = async (id: string | undefined) => {
   const res = await axiosWithCredentials.get<BookWithDetailsAxiosResponse>(

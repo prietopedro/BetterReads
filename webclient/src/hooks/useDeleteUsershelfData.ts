@@ -21,10 +21,3 @@ function useDeleteUsershelfData() {
 }
 
 export default useDeleteUsershelfData;
-
-/*   const { mutate: addShelf } = useMutation({
-    mutationFn: (params: string) => addUserShelf(params),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['shelves'] });
-    },
-  }); */

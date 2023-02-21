@@ -1,7 +1,7 @@
 import { Box, Button, Text, Flex, Spinner } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import CreateShelfModal from './CreateBookshelfModal';
+import CreateShelfModal from './Modals/CreateBookshelfModal';
 import useUserbooksData from '../hooks/useUserbooksData';
 
 function Shelves() {

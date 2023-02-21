@@ -23,7 +23,7 @@ const bookSchema = new mongoose_1.default.Schema({
     },
     title: String,
     thumbnail: String,
-    authors: String,
+    authors: [String],
     average_rating: Number,
 });
 bookSchema.index({ user: 1, googleID: 1 }, { unique: true });

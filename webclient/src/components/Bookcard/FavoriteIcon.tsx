@@ -1,6 +1,6 @@
 import { Flex, IconButton } from '@chakra-ui/react';
 import { FaHeart } from 'react-icons/fa';
-import { BookAction } from './types';
+import { BookAction } from '../../types';
 
 type Props = {
   favorited: boolean;

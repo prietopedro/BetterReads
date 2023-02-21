@@ -1,7 +1,7 @@
 import { Flex } from '@chakra-ui/react';
 import { useMemo } from 'react';
 import BookcardRatingStar from './BookcardRatingStar';
-import { BookAction } from './types';
+import { BookAction } from '../../types';
 
 type Props = {
   rating: number;

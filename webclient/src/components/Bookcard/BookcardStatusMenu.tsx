@@ -1,6 +1,6 @@
 import { Icon, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
 import { FaChevronDown } from 'react-icons/fa';
-import { BookAction } from './types';
+import { BookAction } from '../../types';
 import CapitalizeFirstChar from '../../utils/CapitalizeFirstChar';
 
 type Props = {

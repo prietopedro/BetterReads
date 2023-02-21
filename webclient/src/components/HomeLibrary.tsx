@@ -8,10 +8,10 @@ import {
   MenuList,
   MenuItem,
 } from '@chakra-ui/react';
-import BookCard from './Bookcard';
-import ManageBookshelfModal from './ManageBookshelfModal';
-import EditBookshelfModal from './EditBookshelfModal';
-import { Book } from '../api/userbooks';
+import BookCard from './Bookcard/Bookcard';
+import ManageBookshelfModal from './Modals/ManageBookshelfModal';
+import EditBookshelfModal from './Modals/EditBookshelfModal';
+import { Book } from '../types';
 import useDeleteUsershelfData from '../hooks/useDeleteUsershelfData';
 
 type Props = {
@@ -84,18 +84,9 @@ function HomeLibrary({ library, books, onlyImage = false, id = '' }: Props) {
           books?.map((book: Book, i: number) => {
             return (
               <BookCard
-                id={book.id}
                 key={book.id + i.toString()}
-                imageUrl={book.thumbnail || ''}
                 onlyImage={onlyImage}
-                title={book.title}
-                author={book.authors}
-                rating={book.average_rating || 0}
-                ISBN10={book.ISBN10}
-                status={book.status}
-                favorited={book.favorited}
-                googleID={book.googleID}
-                userRating={book.rating}
+                book={book}
               />
             );
           })}
