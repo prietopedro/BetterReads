@@ -2,7 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from 'cookie-parser';
 import mongoSanitize from "express-mongo-sanitize";
+import session from "express-session";
 import mongoose from "mongoose";
+import MongoStore from "connect-mongo";
 
 process.on("uncaughtException", err => {
     console.error("UNHANDLED EXCEPTION! SHUTTING DOWN...")
@@ -10,7 +12,7 @@ process.on("uncaughtException", err => {
     process.exit(1)
 })
 
-import { PORT, MONGO_DB_URL } from "./config/constants.js";
+import { PORT, MONGO_DB_URL, SESSION_SECRET } from "./config/constants.js";
 import globalErrorHandler from "./controllers/errorController.js";
 import AppError from "./utils/appError.js";
 import userRouter from "./routes/userRoutes.js";
@@ -22,8 +24,8 @@ dotenv.config();
 
 mongoose
     .connect(MONGO_DB_URL)
-    .then(() => console.log('DB connection successful!'));
-app.use(express.json({ limit: '10kb' }))
+    .then(() => {
+        app.use(express.json({ limit: '10kb' }))
 app.use(cookieParser())
 app.use(mongoSanitize())
 
@@ -48,3 +50,4 @@ process.on("unhandledRejection", (err: Error) => {
     })
 
 })
+    });

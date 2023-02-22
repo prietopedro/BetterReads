@@ -32,9 +32,11 @@ const signup = catchAsync(async (req: Request, res: Response, next: NextFunction
 })
 
 const login = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password } = req.body;
-    if (!email || !password) return next(new AppError(400, "Email and password required"));
-    const user = await User.findOne<IUser>({ email }).select('+password')
+    const { email, password, username } = req.body;
+    if ((!email && !username) || !password) return next(new AppError(400, "Email/Username and password required"));
+    let user;
+    if(email) user = await User.findOne<IUser>({ email }).select('+password')
+    else if(username) user = await User.findOne<IUser>({ username }).select('+password')
     if (!user || !await user.correctPassword(password, user.password)) return next(new AppError(401, "Incorrect email or password"));
     let token = signToken(user._id.toString());
     res.cookie('jwt', token, {

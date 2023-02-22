@@ -22,25 +22,26 @@ const app = (0, express_1.default)();
 dotenv_1.default.config();
 mongoose_1.default
     .connect(constants_js_1.MONGO_DB_URL)
-    .then(() => console.log('DB connection successful!'));
-app.use(express_1.default.json({ limit: '10kb' }));
-app.use((0, cookie_parser_1.default)());
-app.use((0, express_mongo_sanitize_1.default)());
-app.get("/", (req, res) => {
-    res.send("WORKING");
-});
-app.use("/users", userRoutes_js_1.default);
-app.use("/books", bookRoutes_js_1.default);
-app.all("*", (req, res, next) => {
-    next(new appError_js_1.default(404, `Can't find ${req.originalUrl} on this server`));
-});
-app.use(errorController_js_1.default);
-const server = app.listen(constants_js_1.PORT, () => console.log(`Server started on port ${constants_js_1.PORT}`));
-process.on("unhandledRejection", (err) => {
-    console.error("UNHANDLED REJECTION! SHUTTING DOWN...");
-    console.error(err.name, err.message);
-    server.close(() => {
-        process.exit(1);
+    .then(() => {
+    app.use(express_1.default.json({ limit: '10kb' }));
+    app.use((0, cookie_parser_1.default)());
+    app.use((0, express_mongo_sanitize_1.default)());
+    app.get("/", (req, res) => {
+        res.send("WORKING");
+    });
+    app.use("/users", userRoutes_js_1.default);
+    app.use("/books", bookRoutes_js_1.default);
+    app.all("*", (req, res, next) => {
+        next(new appError_js_1.default(404, `Can't find ${req.originalUrl} on this server`));
+    });
+    app.use(errorController_js_1.default);
+    const server = app.listen(constants_js_1.PORT, () => console.log(`Server started on port ${constants_js_1.PORT}`));
+    process.on("unhandledRejection", (err) => {
+        console.error("UNHANDLED REJECTION! SHUTTING DOWN...");
+        console.error(err.name, err.message);
+        server.close(() => {
+            process.exit(1);
+        });
     });
 });
 //# sourceMappingURL=index.js.map

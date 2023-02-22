@@ -25,10 +25,14 @@ const signup = (0, catchAsync_js_1.default)(async (req, res, next) => {
     });
 });
 const login = (0, catchAsync_js_1.default)(async (req, res, next) => {
-    const { email, password } = req.body;
-    if (!email || !password)
-        return next(new appError_js_1.default(400, "Email and password required"));
-    const user = await userModel_js_1.default.findOne({ email }).select('+password');
+    const { email, password, username } = req.body;
+    if ((!email && !username) || !password)
+        return next(new appError_js_1.default(400, "Email/Username and password required"));
+    let user;
+    if (email)
+        user = await userModel_js_1.default.findOne({ email }).select('+password');
+    else if (username)
+        user = await userModel_js_1.default.findOne({ username }).select('+password');
     if (!user || !await user.correctPassword(password, user.password))
         return next(new appError_js_1.default(401, "Incorrect email or password"));
     let token = signToken(user._id.toString());
