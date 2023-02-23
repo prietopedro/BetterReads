@@ -10,7 +10,11 @@ import {
   InputGroup,
   InputRightElement,
   FormErrorMessage,
+  Box,
+  InputLeftAddon,
+  InputRightAddon,
 } from '@chakra-ui/react';
+import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import {
@@ -18,7 +22,10 @@ import {
   AiFillEye,
   AiOutlineWarning,
 } from 'react-icons/ai';
+import axiosWithCredentials from '../../../api/axios';
 import useAuth from '../../../hooks/useAuth';
+import PhonenumberInput from '../components/Forms/PhonenumberInput';
+import RegularInput from '../components/Forms/RegularInput';
 
 import { ComponentToRender } from '../components/types';
 
@@ -27,19 +34,27 @@ type Props = {
 };
 
 interface Inputs {
-  email: string;
+  identifier: string;
   password: string;
+  otp: string;
 }
-
-function SignupWithEmail({ setModal }: Props) {
+type Submission = {
+  email?: string;
+  phone?: string;
+};
+async function RequestOTP(values: Submission) {
+  await axiosWithCredentials.post('/api/users/otp', values);
+}
+function SignupWithEmailOrPassword({ setModal }: Props) {
   const [showPassword, setShowIsPassword] = useState(false);
+  const [emailOrPhone, setEmailOrPhone] = useState<'email' | 'phone'>('email');
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
   } = useForm<Inputs>({
-    defaultValues: { email: '', password: '' },
+    defaultValues: { identifier: '', password: '', otp: '' },
   });
   const {
     register: registerUser,
@@ -48,10 +63,17 @@ function SignupWithEmail({ setModal }: Props) {
     registerIsLoading,
   } = useAuth();
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    const formValues = { password: data.password, email: '', username: '' };
-    registerUser(formValues);
+    const formValues = {
+      password: data.password,
+      [emailOrPhone]: data.identifier,
+    };
+    console.log(formValues);
+    // registerUser(formValues);
   };
-  const isGood = watch('email').length && watch('password').length;
+  const { mutate: requestOTP } = useMutation({
+    mutationFn: (params: Submission) => RequestOTP(params),
+  });
+  const isGood = watch('identifier')?.length && watch('password')?.length;
   return (
     <>
       <ModalBody>
@@ -61,15 +83,43 @@ function SignupWithEmail({ setModal }: Props) {
         <Stack spacing={4} direction="column" align="center">
           <form onSubmit={handleSubmit(onSubmit)} style={{ width: '100%' }}>
             <FormControl paddingBottom="0.5rem">
-              <FormLabel htmlFor="email-username">Email</FormLabel>
-              <Input
-                id="email"
-                placeholder="Email"
-                size="md"
-                variant="filled"
-                _focus={{ backgroundColor: '#E2E8F0' }}
-                {...register('email')}
-              />
+              <Box display="flex" justifyContent="space-between" width="100%">
+                <FormLabel htmlFor="email">Email</FormLabel>
+                <Text
+                  cursor="pointer"
+                  onClick={() =>
+                    setEmailOrPhone((old) =>
+                      old === 'email' ? 'phone' : 'email',
+                    )
+                  }
+                >
+                  {emailOrPhone === 'email'
+                    ? 'Sign up with phone'
+                    : 'Sign up with email'}
+                </Text>
+              </Box>
+              {emailOrPhone === 'email' ? (
+                <Input
+                  placeholder="Email"
+                  variant="filled"
+                  size="md"
+                  _focus={{ backgroundColor: '#E2E8F0' }}
+                  {...register('identifier')}
+                />
+              ) : (
+                <InputGroup>
+                  <InputLeftAddon border="none">+1</InputLeftAddon>
+                  <Input
+                    type="tel"
+                    id="identifier"
+                    placeholder="phone"
+                    variant="filled"
+                    size="md"
+                    _focus={{ backgroundColor: '#E2E8F0' }}
+                    {...register('identifier')}
+                  />
+                </InputGroup>
+              )}
             </FormControl>
             <FormControl paddingBottom="0.5rem" isInvalid={!!registerError}>
               <InputGroup>
@@ -100,6 +150,28 @@ function SignupWithEmail({ setModal }: Props) {
                 </InputRightElement>
               </InputGroup>
               <FormErrorMessage>{registerError}</FormErrorMessage>
+            </FormControl>
+            <FormControl>
+              <InputGroup>
+                <Input
+                  type="tel"
+                  id="phone"
+                  placeholder="phone"
+                  variant="filled"
+                  size="md"
+                  _focus={{ backgroundColor: '#E2E8F0' }}
+                  {...register('otp')}
+                />
+                <InputRightAddon
+                  border="none"
+                  cursor="pointer"
+                  onClick={() =>
+                    requestOTP({ [emailOrPhone]: watch('identifier') })
+                  }
+                >
+                  Send Code
+                </InputRightAddon>
+              </InputGroup>
             </FormControl>
             <Button
               type="submit"
@@ -134,4 +206,4 @@ function SignupWithEmail({ setModal }: Props) {
   );
 }
 
-export default SignupWithEmail;
+export default SignupWithEmailOrPassword;
