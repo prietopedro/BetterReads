@@ -8,16 +8,16 @@ import UserAuthButton from '../components/UserAuthButton';
 type Props = {
   setModal: React.Dispatch<React.SetStateAction<ComponentToRender>>;
 };
-function LoginMain({ setModal }: Props) {
+function SignupMain({ setModal }: Props) {
   return (
     <>
       <ModalBody>
         <Text as="h2" textAlign="center" fontSize="1.8rem" py="1rem">
-          Login To Better Reads
+          Sign up for Better Reads
         </Text>
         <Stack spacing={4} direction="column" align="center">
           <UserAuthButton
-            onClick={() => setModal(ComponentToRender.LoginWithEmailModal)}
+            onClick={() => setModal(ComponentToRender.SignupWithEmailModal)}
           />
           <GoogleButton />
           <FacebookButton />
@@ -34,9 +34,9 @@ function LoginMain({ setModal }: Props) {
             color="teal"
             as="span"
             cursor="pointer"
-            onClick={() => setModal(ComponentToRender.SignupMainModal)}
+            onClick={() => setModal(ComponentToRender.LoginMainModal)}
           >
-            Sign up
+            Log in
           </Text>
         </Text>
       </ModalFooter>
@@ -44,4 +44,4 @@ function LoginMain({ setModal }: Props) {
   );
 }
 
-export default LoginMain;
+export default SignupMain;

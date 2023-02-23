@@ -16,6 +16,8 @@ import useAuth from '../../../hooks/useAuth';
 import { ComponentToRender } from '../components/types';
 import LoginMain from './LoginMain';
 import LoginWithEmail from './LoginWithEmail';
+import SignupMain from './SignupMain';
+import SignupWithEmail from './SignupWithEmail';
 
 function BaseAuthModal() {
   const [modalNum, setModalNum] = useState(ComponentToRender.LoginMainModal);
@@ -27,6 +29,10 @@ function BaseAuthModal() {
         return <LoginMain setModal={setModalNum} />;
       case ComponentToRender.LoginWithEmailModal:
         return <LoginWithEmail setModal={setModalNum} />;
+      case ComponentToRender.SignupMainModal:
+        return <SignupMain setModal={setModalNum} />;
+      case ComponentToRender.SignupWithEmailModal:
+        return <SignupWithEmail setModal={setModalNum} />;
       default:
         return <h1>HI</h1>;
     }

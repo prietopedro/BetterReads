@@ -9,6 +9,7 @@ const userController_js_1 = __importDefault(require("../controllers/userControll
 const router = express_1.default.Router();
 router.post("/signup", authController_js_1.default.signup);
 router.post("/login", authController_js_1.default.login);
+router.post("/otp", authController_js_1.default.requestOTPVerificationCode);
 router.post("/logout", authController_js_1.default.logout);
 router.get("/me", [authController_js_1.default.protect], userController_js_1.default.me);
 router.get("/books", [authController_js_1.default.protect], userController_js_1.default.getUserBooks);

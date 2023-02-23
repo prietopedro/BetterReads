@@ -27,11 +27,11 @@ type Props = {
 };
 
 interface Inputs {
-  emailOrUsername: string;
+  email: string;
   password: string;
 }
 
-function LoginWithEmail({ setModal }: Props) {
+function SignupWithEmail({ setModal }: Props) {
   const [showPassword, setShowIsPassword] = useState(false);
   const {
     register,
@@ -39,38 +39,39 @@ function LoginWithEmail({ setModal }: Props) {
     watch,
     formState: { errors },
   } = useForm<Inputs>({
-    defaultValues: { emailOrUsername: '', password: '' },
+    defaultValues: { email: '', password: '' },
   });
-  const { login, isLoggedIn, loginError, loginIsLoading } = useAuth();
+  const {
+    register: registerUser,
+    isLoggedIn,
+    registerError,
+    registerIsLoading,
+  } = useAuth();
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     const formValues = { password: data.password, email: '', username: '' };
-    if (data.emailOrUsername.indexOf('@') !== -1)
-      formValues.email = data.emailOrUsername;
-    else formValues.username = data.emailOrUsername;
-    login(formValues);
+    registerUser(formValues);
   };
-  console.log(isLoggedIn);
-  const isGood = watch('emailOrUsername').length && watch('password').length;
+  const isGood = watch('email').length && watch('password').length;
   return (
     <>
       <ModalBody>
         <Text as="h2" textAlign="center" fontSize="1.8rem" py="1rem">
-          Login
+          Signup
         </Text>
         <Stack spacing={4} direction="column" align="center">
           <form onSubmit={handleSubmit(onSubmit)} style={{ width: '100%' }}>
             <FormControl paddingBottom="0.5rem">
-              <FormLabel htmlFor="email-username">Email or username</FormLabel>
+              <FormLabel htmlFor="email-username">Email</FormLabel>
               <Input
-                id="email-username"
-                placeholder="Email or username"
+                id="email"
+                placeholder="Email"
                 size="md"
                 variant="filled"
                 _focus={{ backgroundColor: '#E2E8F0' }}
-                {...register('emailOrUsername')}
+                {...register('email')}
               />
             </FormControl>
-            <FormControl paddingBottom="0.5rem" isInvalid={!!loginError}>
+            <FormControl paddingBottom="0.5rem" isInvalid={!!registerError}>
               <InputGroup>
                 <Input
                   id="password"
@@ -82,7 +83,7 @@ function LoginWithEmail({ setModal }: Props) {
                   {...register('password')}
                 />
                 <InputRightElement position="absolute" right="1.2rem">
-                  {!!loginError && <AiOutlineWarning color="red" />}
+                  {!!registerError && <AiOutlineWarning color="red" />}
                 </InputRightElement>
                 <InputRightElement>
                   {showPassword ? (
@@ -98,7 +99,7 @@ function LoginWithEmail({ setModal }: Props) {
                   )}
                 </InputRightElement>
               </InputGroup>
-              <FormErrorMessage>{loginError}</FormErrorMessage>
+              <FormErrorMessage>{registerError}</FormErrorMessage>
             </FormControl>
             <Button
               type="submit"
@@ -106,7 +107,7 @@ function LoginWithEmail({ setModal }: Props) {
               isDisabled={!isGood}
               background="teal"
               color="white"
-              isLoading={loginIsLoading}
+              isLoading={registerIsLoading}
             >
               Login
             </Button>
@@ -123,9 +124,9 @@ function LoginWithEmail({ setModal }: Props) {
             color="teal"
             as="span"
             cursor="pointer"
-            onClick={() => setModal(ComponentToRender.SignupMainModal)}
+            onClick={() => setModal(ComponentToRender.LoginMainModal)}
           >
-            Sign up
+            Log in
           </Text>
         </Text>
       </ModalFooter>
@@ -133,4 +134,4 @@ function LoginWithEmail({ setModal }: Props) {
   );
 }
 
-export default LoginWithEmail;
+export default SignupWithEmail;

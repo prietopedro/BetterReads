@@ -1,10 +1,13 @@
 import {Request, Response, NextFunction} from "express"
 import jwt from "jsonwebtoken";
+import mailer from "../lib/emails/index.js";
+import OTP from "../models/OTPModel.js";
 
 import { JWT_SECRET, JWT_EXPIRES_IN } from "../config/constants.js";
 import User, { IUser } from "../models/userModel.js";
 import AppError from "../utils/appError.js";
 import catchAsync from "../utils/catchAsync.js";
+import smsSender from "../lib/sms/index.js";
 
 const signToken = (id: string) => {
     return jwt.sign({ id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN })
@@ -83,11 +86,32 @@ const isLoggedIn = catchAsync(async (req: ProtectedRequest, res: Response, next:
     return next()
 })
 
+const requestOTPVerificationCode =  catchAsync(async (req: ProtectedRequest, res: Response, next: NextFunction) => {
+    const {email, phone} = req.body;
+    if(!email && !phone) return next(new AppError(400, "Must provide an email or a phone number"));
+    let user;
+    if(email) user = await User.findOne({email});
+    else if(phone) user = await User.findOne({phone});
+    console.log(user)
+    if(user) return next(new AppError(400, "You already have an account"));
+    const otpvalue = Math.floor(1000 + Math.random() * 9000)
+    const newOTP = await OTP.create({
+        OTP: otpvalue,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 50000
+    })
+    // BOTH WORKING
+    if(email) mailer.sendMail(email,"Verify Your Email",`<h1>${otpvalue}</h1>`)
+    else if(phone) smsSender.sendText(phone,`${otpvalue}`)
+    res.status(200).json({sent: true, OTP: newOTP})
+})
+
 export default {
     isLoggedIn,
     protect,
     logout,
     login,
-    signup
+    signup,
+    requestOTPVerificationCode
 }
 

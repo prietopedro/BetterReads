@@ -4,10 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const index_js_1 = __importDefault(require("../lib/emails/index.js"));
+const OTPModel_js_1 = __importDefault(require("../models/OTPModel.js"));
 const constants_js_1 = require("../config/constants.js");
 const userModel_js_1 = __importDefault(require("../models/userModel.js"));
 const appError_js_1 = __importDefault(require("../utils/appError.js"));
 const catchAsync_js_1 = __importDefault(require("../utils/catchAsync.js"));
+const index_js_2 = __importDefault(require("../lib/sms/index.js"));
 const signToken = (id) => {
     return jsonwebtoken_1.default.sign({ id }, constants_js_1.JWT_SECRET, { expiresIn: constants_js_1.JWT_EXPIRES_IN });
 };
@@ -77,11 +80,37 @@ const isLoggedIn = (0, catchAsync_js_1.default)(async (req, res, next) => {
     req.user = user;
     return next();
 });
+const requestOTPVerificationCode = (0, catchAsync_js_1.default)(async (req, res, next) => {
+    const { email, phone } = req.body;
+    if (!email && !phone)
+        return next(new appError_js_1.default(400, "Must provide an email or a phone number"));
+    let user;
+    if (email)
+        user = await userModel_js_1.default.findOne({ email });
+    else if (phone)
+        user = await userModel_js_1.default.findOne({ phone });
+    console.log(user);
+    if (user)
+        return next(new appError_js_1.default(400, "You already have an account"));
+    const otpvalue = Math.floor(1000 + Math.random() * 9000);
+    const newOTP = await OTPModel_js_1.default.create({
+        OTP: otpvalue,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 50000
+    });
+    // BOTH WORKING
+    if (email)
+        index_js_1.default.sendMail(email, "Verify Your Email", `<h1>${otpvalue}</h1>`);
+    else if (phone)
+        index_js_2.default.sendText(phone, `${otpvalue}`);
+    res.status(200).json({ sent: true, OTP: newOTP });
+});
 exports.default = {
     isLoggedIn,
     protect,
     logout,
     login,
-    signup
+    signup,
+    requestOTPVerificationCode
 };
 //# sourceMappingURL=authController.js.map
