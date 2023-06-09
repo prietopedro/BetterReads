@@ -131,7 +131,7 @@ function BookPage() {
                 Genres
               </Heading>
               <Flex wrap="wrap">
-                {data.categories.map((x) => {
+                {data.categories?.map((x) => {
                   return (
                     <Tag
                       key={x}

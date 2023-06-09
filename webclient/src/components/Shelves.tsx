@@ -83,7 +83,7 @@ function Shelves() {
                           <Box
                             key={(x.toString() + i).toString()}
                             mx="0.5rem"
-                            onClick={() => navigate(`/book/${x.id}`)}
+                            onClick={() => navigate(`/book/2/${x.googleID}`)}
                             cursor="pointer"
                             background={`url(${x.thumbnail}) no-repeat center /cover`}
                             width="50px"
@@ -114,7 +114,7 @@ function Shelves() {
                           <Box
                             key={(x.toString() + i).toString()}
                             mx="0.5rem"
-                            onClick={() => navigate(`/book/${x.id}`)}
+                            onClick={() => navigate(`/book/${x.googleID}`)}
                             cursor="pointer"
                             background={`url(${x.thumbnail}) no-repeat center /cover`}
                             width="50px"
@@ -145,7 +145,7 @@ function Shelves() {
                           <Box
                             key={(x.toString() + i).toString()}
                             mx="0.5rem"
-                            onClick={() => navigate(`/book/${x.id}`)}
+                            onClick={() => navigate(`/book/${x.googleID}`)}
                             cursor="pointer"
                             background={`url(${x.thumbnail}) no-repeat center /cover`}
                             width="50px"
