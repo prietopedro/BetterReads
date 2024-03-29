@@ -30,6 +30,6 @@ jobs:
           application_name: betterreads
           environment_name: Betterreads-env
           existing_bucket_name: elasticbeanstalk-us-east-2-381492186207
-          region: us-east-1
+          region: us-east-2
           version_label: ${{ github.sha }}
           deployment_package: deploy.zip
