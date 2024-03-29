@@ -6,7 +6,7 @@ import {
 } from '@chakra-ui/react';
 import { FieldHookConfig, useField } from 'formik';
 
-type Props = { label: string } & FieldHookConfig<string>;
+type Props = { label: string, placeholder: string } & FieldHookConfig<string>;
 function FormInput({ label, ...props }: Props) {
   const [field, { error, touched }] = useField(props);
   return (
