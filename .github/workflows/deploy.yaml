@@ -28,7 +28,7 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
           aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
           application_name: betterreads
-          environment_name: Betterreads-env-1
+          environment_name: Betterreads-env-2
           existing_bucket_name: elasticbeanstalk-us-east-1-381492186207
           region: us-east-1
           version_label: ${{ github.sha }}
